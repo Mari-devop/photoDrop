@@ -42,5 +42,21 @@ export const Overlay = styled.div`
   width: 100%;
   height: 100%;
   background: rgba(0, 0, 0, 0.5);
-  z-index: 999; /* Ensure it appears behind the popup but above other content */
+  z-index: 999; 
+`;
+
+export const CountdownOverlay = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.7); 
+  color: white;
+  font-size: 96px;
+  font-weight: bold;
+  z-index: 10000; 
 `;

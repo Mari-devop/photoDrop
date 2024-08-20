@@ -9,6 +9,8 @@ export const MainContainer = styled.div`
     width: 100%; 
     max-width: 420px; 
     padding: 0 20px;
+    overflow: hidden;
+    max-height: calc(100vh - 60px); 
 
     @media (max-width: 500px) {
         width: 345px;
@@ -31,6 +33,11 @@ export const Title = styled.h1`
     font-family: 'Termina Test';
     margin-bottom: 29px;
     text-align: center;
+
+    @media(max-width: 500px) {
+        font-size: 22px;
+        line-height: 26px;
+    }
 `;
 
 export const Button = styled.button`
@@ -80,4 +87,23 @@ export const Label = styled.label`
     span {
         font-weight: 400;
     }
+`;
+
+export const Input = styled.input`
+    width: 100%; 
+    height: 40px;
+    background-color: var(--input-color);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    margin-bottom: 20px;
+    outline: none;
+    padding: 12px;
+    box-sizing: border-box; 
+    font-size: 18px; 
+
+    &::placeholder {
+        font-family: 'Futura PT';
+        font-size: 18px;
+        line-height: 23px;
+  }
 `;

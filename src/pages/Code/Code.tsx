@@ -53,8 +53,26 @@ const Code = () => {
       });
   
       const { token } = response.data;
-      localStorage.setItem('authToken', token); 
-      navigate('/selfie'); 
+      localStorage.setItem('authToken', token);
+
+      const selfieCheckResponse = await axios.get('https://photodrop-dawn-surf-6942.fly.dev/client/info', {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      const { selfie, client } = selfieCheckResponse.data;
+      
+      if (selfie === null) {
+        navigate('/selfie');
+      } else {
+        const { name, email } = client;
+
+        if (name === null) {
+          navigate('/name');
+        } else if (email === null) {
+          navigate('/email');
+        } else {
+          navigate('/account');
+        }
+      }
     } catch (error) {
       console.error('Error verifying OTP:', error);
       alert('Failed to verify OTP. Please try again.');
@@ -72,7 +90,7 @@ const Code = () => {
       alert('Code has been resent'); 
     } catch (error) {
       console.error('Error resending OTP:', error);
-      alert('Failed to resend OTP. Please try again.');
+      alert('Failed to login. Try to resend code.');
     } finally {
       setResendLoading(false);
     }

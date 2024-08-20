@@ -28,7 +28,7 @@ export const Row = styled.div`
     padding-left: 14px;
     padding-right: 9px;
 
-    &:last-child {
+  &:last-of-type {
         border-bottom: none;
     }
 
