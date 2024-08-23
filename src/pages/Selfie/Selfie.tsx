@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MainContainer, Title } from '../../styles/Global.styled';
 import { Image, Subtitle, RoundButton, Overlay, CountdownOverlay } from './Selfie.styled';
@@ -11,6 +11,7 @@ import { useSelfie } from '../../hooks/useSelfie';
 const Selfie = () => {
   const {
     selfieSrc,
+    tempSelfieSrc,
     showSelfieEdit,
     countdown,
     isCountingDown,
@@ -21,19 +22,16 @@ const Selfie = () => {
     handleRetake,
     saveSelfie,
     setShowSelfieEdit,
+    togglePopup,
+    showPopup,
+    isSmallScreen,
+    popupRef,
+    handleClosePopup,
   } = useSelfie();
 
-  const [showPopup, setShowPopup] = useState(false);
-  const [isSmallScreen, setIsSmallScreen] = useState(window.innerWidth < 500);
-  const popupRef = useRef<HTMLDivElement | null>(null);
   const navigate = useNavigate();
 
-  const togglePopup = () => {
-    setShowPopup(!showPopup);
-  };
-
   const onClose = () => {
-    setShowPopup(false);
     setShowSelfieEdit(false);
   };
 
@@ -42,33 +40,6 @@ const Selfie = () => {
     setShowSelfieEdit(false);
     navigate('/account');
   };
-
-  useEffect(() => {
-    const handleResize = () => {
-      setIsSmallScreen(window.innerWidth < 500);
-    };
-
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
-
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (popupRef.current && !popupRef.current.contains(event.target as Node)) {
-        onClose();
-      }
-    };
-
-    if (showPopup && isSmallScreen) {
-      document.addEventListener('mousedown', handleClickOutside);
-    } else {
-      document.removeEventListener('mousedown', handleClickOutside);
-    }
-
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [showPopup, isSmallScreen]);
 
   useEffect(() => {
     const token = localStorage.getItem('authToken');
@@ -85,7 +56,7 @@ const Selfie = () => {
         <Image 
           src={selfieSrc || selfiePlaceholder} 
           alt="selfie" 
-          style={{borderRadius: selfieSrc ? '50%' : '0%' }} 
+          style={{ borderRadius: selfieSrc ? '50%' : '0%' }} 
         />
         <RoundButton onClick={togglePopup}>+</RoundButton>
         {showPopup && isSmallScreen && (
@@ -96,13 +67,13 @@ const Selfie = () => {
         {showPopup && !isSmallScreen && (
           <>
             <Overlay onClick={togglePopup} />
-            <SelfiePopup onClose={onClose} onFileUpload={handleFileUpload} onCameraCapture={handleCameraCapture} />
+            <SelfiePopup onClose={handleClosePopup} onFileUpload={handleFileUpload} onCameraCapture={handleCameraCapture} />
           </>
         )}
         {showSelfieEdit && (
           <SelfieEdit
             onClose={onClose}
-            selfieSrc={selfieSrc}
+            tempSelfieSrc={tempSelfieSrc} 
             onRetake={handleRetake}
             onSave={handleSave}
           />

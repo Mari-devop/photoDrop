@@ -13,9 +13,9 @@ import pencil from '../../assets/images/pencil.png';
 import arrow from '../../assets/images/arrowRight.png';
 
 const AccountSettings = () => {
-  const navigate = useNavigate(); 
   const {
     selfieSrc,
+    tempSelfieSrc,
     showPopup,
     showSelfieEdit,
     isSmallScreen,
@@ -51,8 +51,6 @@ const AccountSettings = () => {
           }
         );
 
-        console.log('Full Server Response:', response.data);
-
         const selfieData = response.data?.selfie?.selfie?.data;
 
         if (selfieData && Array.isArray(selfieData)) {
@@ -61,7 +59,6 @@ const AccountSettings = () => {
           const imageUrl = URL.createObjectURL(blob);
 
           setSelfieSrc(imageUrl);
-          console.log('Generated Image URL:', imageUrl);
         } else {
           console.error('Invalid selfie data structure:', selfieData);
         }
@@ -92,7 +89,7 @@ const AccountSettings = () => {
         <Image 
           src={selfieSrc || selfiePlaceholder} 
           alt="selfie" 
-          style={{borderRadius: selfieSrc ? '50%' : '0%' }} 
+          style={{ borderRadius: selfieSrc ? '50%' : '0%' }} 
         />
         <RoundButton onClick={togglePopup}><Pencil src={pencil} alt="pencil" /></RoundButton>
         {showPopup && isSmallScreen && (
@@ -108,10 +105,10 @@ const AccountSettings = () => {
         )}
         {showSelfieEdit && (
           <SelfieEdit
-            onClose={() => setShowSelfieEdit(false)}
-            selfieSrc={selfieSrc}
+            onClose={() => setShowSelfieEdit(false)} 
+            tempSelfieSrc={tempSelfieSrc} 
             onRetake={handleRetake}
-            onSave={handleSave}
+            onSave={handleSave} 
           />
         )}
 

@@ -39,9 +39,24 @@ const Email = () => {
     setEmail(e.target.value);
   };
 
-  const handleSubmit = async () => {
-    if (!email.trim()) {
-      alert('Please enter your email');
+  const validateEmail = (email: string) => {
+    const emailPatern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
+    if(!email.trim()) {
+      return 'Please enter your email';
+    } 
+    if (email.length < 5) {
+      return 'Email must be at least 5 characters long';
+    }
+    if (!emailPatern.test(email)) {
+      return 'Please enter a valid email';
+    }
+    return null;  
+  };
+
+   const handleSubmit = async () => {
+    const validationError = validateEmail(email);
+    if (validationError) {
+      alert(validationError);
       return;
     }
 

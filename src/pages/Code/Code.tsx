@@ -88,6 +88,8 @@ const Code = () => {
         phoneNumber,
       });
       alert('Code has been resent'); 
+      setOtp(new Array(6).fill(""));
+      inputRefs.current[0]?.focus(); 
     } catch (error) {
       console.error('Error resending OTP:', error);
       alert('Failed to login. Try to resend code.');

@@ -5,12 +5,12 @@ import { getCroppedImg } from '../../utils/CropImage';
 
 interface SelfieEditProps {
   onClose: () => void;
-  selfieSrc: string | null;  
+  tempSelfieSrc: string | null; 
   onRetake: () => void;
   onSave: (croppedImage: ArrayBuffer) => void;
 }
 
-const SelfieEdit = ({ onClose, selfieSrc, onRetake, onSave }: SelfieEditProps) => {
+const SelfieEdit = ({ onClose, tempSelfieSrc, onRetake, onSave }: SelfieEditProps) => {
   const [crop, setCrop] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
   const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null);
@@ -20,15 +20,16 @@ const SelfieEdit = ({ onClose, selfieSrc, onRetake, onSave }: SelfieEditProps) =
   }, []);
 
   const handleSave = useCallback(async () => {
-    if (selfieSrc && croppedAreaPixels) {
+    if (tempSelfieSrc && croppedAreaPixels) {
       try {
-        const croppedImageBuffer = await getCroppedImg(selfieSrc, croppedAreaPixels);
+        const croppedImageBuffer = await getCroppedImg(tempSelfieSrc, croppedAreaPixels);
         onSave(croppedImageBuffer);
+        onClose(); 
       } catch (error) {
         console.error(error);
       }
     }
-  }, [selfieSrc, croppedAreaPixels, onSave]);
+  }, [tempSelfieSrc, croppedAreaPixels, onSave, onClose]);
 
   return (
     <>
@@ -51,7 +52,7 @@ const SelfieEdit = ({ onClose, selfieSrc, onRetake, onSave }: SelfieEditProps) =
             }}
           >
             <Cropper 
-              image={selfieSrc || undefined}
+              image={tempSelfieSrc || undefined}
               crop={crop}
               zoom={zoom}
               aspect={1} 

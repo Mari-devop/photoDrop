@@ -3,6 +3,7 @@ import axios from 'axios';
 
 export const useSelfie = () => {
   const [selfieSrc, setSelfieSrc] = useState<string | null>(null);
+  const [tempSelfieSrc, setTempSelfieSrc] = useState<string | null>(null); 
   const [showPopup, setShowPopup] = useState(false);
   const [showSelfieEdit, setShowSelfieEdit] = useState(false);
   const [isSmallScreen, setIsSmallScreen] = useState(window.innerWidth < 500);
@@ -32,7 +33,7 @@ export const useSelfie = () => {
   const handleFileUpload = (file: File) => {
     const reader = new FileReader();
     reader.onloadend = () => {
-      setSelfieSrc(reader.result as string);
+      setTempSelfieSrc(reader.result as string); 
       setShowSelfieEdit(true);
       setShowPopup(false);
     };
@@ -48,23 +49,23 @@ export const useSelfie = () => {
 
         setCountdown(5);
         setIsCountingDown(true);
-        let count = 5;
         const countdownInterval = setInterval(() => {
-          count -= 1;
-          setCountdown(count);
-          if (count === 0) {
-            clearInterval(countdownInterval);
-            setIsCountingDown(false);
-            const context = canvasRef.current?.getContext('2d');
-            if (context && videoRef.current && canvasRef.current) {
-              context.drawImage(videoRef.current, 0, 0, canvasRef.current.width, canvasRef.current.height);
-              const imageDataUrl = canvasRef.current.toDataURL('image/png');
-              setSelfieSrc(imageDataUrl);
-              setShowSelfieEdit(true);
-              setShowPopup(false);
+          setCountdown((prevCount) => {
+            if (prevCount === 1) {
+              clearInterval(countdownInterval);
+              setIsCountingDown(false);
+              const context = canvasRef.current?.getContext('2d');
+              if (context && videoRef.current && canvasRef.current) {
+                context.drawImage(videoRef.current, 0, 0, canvasRef.current.width, canvasRef.current.height);
+                const imageDataUrl = canvasRef.current.toDataURL('image/png');
+                setTempSelfieSrc(imageDataUrl); 
+                setShowSelfieEdit(true);
+                setShowPopup(false);
+              }
+              stream.getTracks().forEach(track => track.stop());
             }
-            stream.getTracks().forEach(track => track.stop());
-          }
+            return prevCount - 1;
+          });
         }, 1000);
       }
     } catch (error) {
@@ -85,7 +86,7 @@ export const useSelfie = () => {
         });
 
         setSelfieSrc(URL.createObjectURL(blob)); 
-        setShowSelfieEdit(false); 
+        setShowSelfieEdit(false);
       }
     } catch (error) {
       console.error('Error saving selfie to server:', error);
@@ -94,13 +95,14 @@ export const useSelfie = () => {
   };
 
   const handleRetake = () => {
-    setSelfieSrc(null); 
+    setTempSelfieSrc(null); 
     setShowSelfieEdit(false); 
     togglePopup(); 
   };
 
   return {
     selfieSrc,
+    tempSelfieSrc,
     showPopup,
     showSelfieEdit,
     isSmallScreen,

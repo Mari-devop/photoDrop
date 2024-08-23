@@ -13,6 +13,7 @@ import Name from './pages/Name/Name';
 import Email from './pages/Email/Email';
 import AccountSettings from './pages/AccountSettings/AccountSettings';
 import NameEdit from './pages/NameEdit/NameEdit';
+import AlbumDetails from './components/albumDetails/AlbumDetails';
 
 function App() {
   const [otpSent, setOtpSent] = useState(false);
@@ -32,6 +33,8 @@ function App() {
           <Route path="/name" element={<ProtectedRoute element={<Name />} />} />
           <Route path="/nameedit" element={<ProtectedRoute element={<NameEdit />} />} />
           <Route path="/email" element={<ProtectedRoute element={<Email />} />} />
+          <Route path="/albumDetails/:albumId" element={<ProtectedRoute element={<AlbumDetails />} />} />
+
         </Routes>
       </Container>
     </Router>

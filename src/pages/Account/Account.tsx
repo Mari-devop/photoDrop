@@ -1,39 +1,66 @@
-import React, { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Container, Image, Subtitle, Text, PreviewContainer, Title, PrintImage, Grid } from './Account.styled';
-import group from '../../assets/images/Group.png';
-import print1 from '../../assets/images/Photo Wall.png';
-import print2 from '../../assets/images/Photo Wall-2.png';
-import print3 from '../../assets/images/Photo Wall-3.png';
-import Footer from '../../components/footer/Footer';
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
+import AccountFullData from '../../components/accountFullData/AccountFullData';
+import AccountEmpty from '../../components/accountEmpty/AccountEmpty';
+import { ThreeCircles } from 'react-loader-spinner';
 
 const Account = () => {
-  const navigate = useNavigate();
+  const [imagesData, setImagesData] = useState([]);
+  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
-    const token = localStorage.getItem('authToken');
-    if (!token) {
-      navigate('/');
-    }
-  }, [navigate]);
+    const fetchImagesData = async () => {
+      const token = localStorage.getItem('authToken');
+
+      try {
+        const response = await axios.get('https://photodrop-dawn-surf-6942.fly.dev/client/images', {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        });
+
+        if (response.status === 200) {
+          const data = response.data;
+          setImagesData(data);
+        } else {
+          console.error('Failed to fetch images data. Server responded with:', response.status);
+        }
+      } catch (error) {
+        console.error('Error fetching images data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchImagesData();
+  }, []);
+
+  if (loading) {
+    return (
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+        <ThreeCircles
+          visible={true}
+          height="100"
+          width="100"
+          color="#3300CC"
+          ariaLabel="three-circles-loading"
+          wrapperStyle={{}}
+          wrapperClass=""
+        />
+      </div>
+    ); 
+  }
 
   return (
     <div style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-      <Container>
-        <Image src={group} alt="Account" />
-        <Subtitle>Your photos will drop soon.</Subtitle>
-        <Text>You will get a text message when they are ready. It can take up to 48 hours.</Text>
-      </Container>
-      <PreviewContainer>
-        <Title>Browse Artist Prints</Title>
-        <Grid>
-          <PrintImage src={print1} alt="Print 1" />
-          <PrintImage src={print2} alt="Print 2" />
-          <PrintImage src={print3} alt="Print 3" />
-        </Grid>
-      </PreviewContainer>
-      <Footer />
+      {imagesData.length > 0 ? (
+        <AccountFullData imagesData={imagesData} />
+      ) : (
+        <AccountEmpty />
+      )}
     </div>
-  )
-}
+  );
+};
 
-export default Account
+export default Account;
