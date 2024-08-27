@@ -11,7 +11,7 @@ export const SettingsContainer = styled.div`
     overflow: hidden;
     
     @media(max-width: 500px) {
-        width: 345px; 
+        max-width: 345px; 
     }
 `;
 
@@ -44,6 +44,10 @@ export const RoundButton = styled.button`
     position: absolute;
     bottom: 5px; 
     right: 230px; 
+
+    @media(max-width: 500px) {
+        right: 155px; 
+    }
 `;
 
 export const TextContainer = styled.div`

@@ -9,12 +9,13 @@ export const MainContainer = styled.div`
     width: 100%; 
     max-width: 420px; 
     padding: 0 20px;
-    overflow: hidden;
+   
     max-height: calc(100vh - 60px); 
+   
 
     @media (max-width: 500px) {
         width: 345px;
-     
+        height: 100%;
         padding: 0 20px;
     }
 

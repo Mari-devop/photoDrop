@@ -4,7 +4,7 @@ import AccountFullData from '../../components/accountFullData/AccountFullData';
 import AccountEmpty from '../../components/accountEmpty/AccountEmpty';
 import { ThreeCircles } from 'react-loader-spinner';
 
-const Account = () => {
+const Account: React.FC = () => {
   const [imagesData, setImagesData] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -54,12 +54,14 @@ const Account = () => {
 
   return (
     <div style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-      {imagesData.length > 0 ? (
-        <AccountFullData imagesData={imagesData} />
-      ) : (
-        <AccountEmpty />
-      )}
-    </div>
+    {imagesData.length > 0 ? (
+      <AccountFullData 
+        imagesData={imagesData} 
+      />
+    ) : (
+      <AccountEmpty />
+    )}
+  </div>
   );
 };
 

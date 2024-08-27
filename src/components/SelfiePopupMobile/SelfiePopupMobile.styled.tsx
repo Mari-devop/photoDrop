@@ -8,7 +8,7 @@ export const MobileContainer = styled.div`
     box-sizing: border-box;
     position: absolute;
     top: calc(100% + 30px); 
-    right: -135px; 
+    right: -110px; 
     transform: translate(-50%, -50%);
     background-color: var(--popup-color);
     border-radius: 12px;

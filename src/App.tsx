@@ -14,11 +14,20 @@ import Email from './pages/Email/Email';
 import AccountSettings from './pages/AccountSettings/AccountSettings';
 import NameEdit from './pages/NameEdit/NameEdit';
 import AlbumDetails from './components/albumDetails/AlbumDetails';
+import { loadStripe } from '@stripe/stripe-js';
+import { Elements } from '@stripe/react-stripe-js';
+import PaymentPage from './components/PaymentPage/PaymentPage';
+import ThankU from './components/thanku/ThankU';
+
+
+const stripePromise = loadStripe("pk_test_51PqIRMRxh50Nc0qLf4KgICJ8Gb4lP7e4iOqZp0SJFlG9rIABwbfH0u09I708ArEEkN3VJ3lzojlUcuvwZ0IYXpcU00E7LfZZkG");
 
 function App() {
   const [otpSent, setOtpSent] = useState(false);
 
+
   return (
+    <Elements stripe={stripePromise}>
     <Router>
       <Navbar />
       <Container>
@@ -34,10 +43,12 @@ function App() {
           <Route path="/nameedit" element={<ProtectedRoute element={<NameEdit />} />} />
           <Route path="/email" element={<ProtectedRoute element={<Email />} />} />
           <Route path="/albumDetails/:albumId" element={<ProtectedRoute element={<AlbumDetails />} />} />
-
+          <Route path="/payment" element={<PaymentPage />} />
+          <Route path="/success" element={<ThankU />} />
         </Routes>
       </Container>
     </Router>
+    </Elements>
   );
 }
 

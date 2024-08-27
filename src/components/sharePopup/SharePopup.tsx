@@ -24,22 +24,29 @@ const SharePopup = ({ selectedImage, onClose }: SharePopupProps) => {
 
   const handleAddToPhotos = () => {
     if (selectedImage) {
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(dataURItoBlob(selectedImage.binaryString));
-      a.download = `image_${selectedImage.id}.jpeg`;
-      a.click();
+        if (selectedImage.binaryString.startsWith('data:image')) {
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(dataURItoBlob(selectedImage.binaryString));
+            a.download = `image_${selectedImage.id}.jpeg`;
+            a.click();
+        } else {
+            const a = document.createElement('a');
+            a.href = selectedImage.binaryString;
+            a.download = `image_${selectedImage.id}.jpeg`;
+            a.click();
+        }
     }
   };
 
   const handleCopyClick = () => {
     if (navigator.clipboard && selectedImage) {
-      navigator.clipboard.writeText(selectedImage.binaryString)
-        .then(() => console.log('Image copied to clipboard'))
-        .catch((err) => console.error('Could not copy image: ', err));
+        navigator.clipboard.writeText(selectedImage.binaryString)
+            .then(() => console.log('Base64 image string copied to clipboard'))
+            .catch((err) => console.error('Could not copy image string: ', err));
     } else {
-      console.log('Clipboard API is not supported in your browser.');
+        console.log('Clipboard API is not supported in your browser.');
     }
-  };
+};
 
   return (
     <ShareContainer>

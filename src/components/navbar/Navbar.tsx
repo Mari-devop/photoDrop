@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation, Link } from 'react-router-dom';
+import axios from 'axios';
 import logo from '../../assets/images/logo.png';
 import {
   NavbarContainer,
@@ -14,12 +15,14 @@ import {
   Button
 } from './Navbar.styled';
 import arrow from '../../assets/images/arrowLeft.png';
-import axios from 'axios';
+import PayPopup from '../payPopup/PayPopup';
 
 const Navbar = () => {
   const location = useLocation();
   const albumId = location.pathname.split("/").pop();
   const [selfieSrc, setSelfieSrc] = useState<string | null>(null);
+  const [areAllPhotosPurchased, setAreAllPhotosPurchased] = useState(false);
+  const [showPayPopup, setShowPayPopup] = useState(false);
   const searchParams = new URLSearchParams(location.search);
   const photoCount = searchParams.get('photos');
   const date = searchParams.get('date');
@@ -27,7 +30,6 @@ const Navbar = () => {
   useEffect(() => {
     const fetchSelfie = async () => {
       const token = localStorage.getItem('authToken');
-
       if (!token) {
         console.error('Auth token not found in localStorage');
         return;
@@ -57,14 +59,45 @@ const Navbar = () => {
       }
     };
 
+    const fetchAlbumPhotos = async () => {
+      const token = localStorage.getItem('authToken');
+      if (!token) {
+        console.error('Auth token not found in localStorage');
+        return;
+      }
+
+      try {
+        const albumResponse = await axios.get(
+          'https://photodrop-dawn-surf-6942.fly.dev/client/images',
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+
+        if (albumResponse.status === 200 && Array.isArray(albumResponse.data)) {
+          const selectedAlbum = albumResponse.data.find((album: any) => album.location === albumId);
+
+          if (selectedAlbum) {
+            const allPurchased = selectedAlbum.images.every((image: any) => image.isPurchased);
+            setAreAllPhotosPurchased(allPurchased);
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching album photos:', error);
+      }
+    };
+
     fetchSelfie();
+    if (albumId) {
+      fetchAlbumPhotos();
+    }
 
     return () => {
       if (selfieSrc) {
         URL.revokeObjectURL(selfieSrc);
       }
     };
-  }, [location.pathname]);
+  }, [location.pathname, albumId]);
 
   const isAlbumDetailsPage = location.pathname.startsWith('/albumDetails') && albumId;
 
@@ -72,6 +105,20 @@ const Navbar = () => {
     ? new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) 
     : '';
     
+    const handleUnlockPhotosClick = () => {
+      setShowPayPopup(true);
+      setTimeout(() => {
+        const popupElement = document.getElementById('pay-popup');
+        if (popupElement) {
+          popupElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }, 0);
+    };
+    
+  const handleClosePayPopup = () => {
+    setShowPayPopup(false);
+  };
+
   return (
     <NavbarContainer>
       {location.pathname === '/nameedit' && (
@@ -115,9 +162,16 @@ const Navbar = () => {
             </Wrapper>
           </div>
           <div>
-            <Button>Unlock your photos</Button>
+            {!areAllPhotosPurchased && <Button onClick={handleUnlockPhotosClick}>Unlock your photos</Button>}
           </div>
         </Context>
+      )}
+      {showPayPopup && (
+        <PayPopup 
+          onClose={handleClosePayPopup}
+          imageIds={[]} 
+          showAllPhotosOnly={true} 
+        />
       )}
     </NavbarContainer>
   );

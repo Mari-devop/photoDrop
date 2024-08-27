@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FullscreenImageProps } from './types';
 import { 
   CloseButton, 
@@ -12,14 +12,55 @@ import SharePopup from '../sharePopup/SharePopup';
 import downArrow from '../../assets/images/downArrow.png';
 import share from '../../assets/images/share.png';
 import { dataURItoBlob } from '../../utils/ConverFunc';
+import PayPopup from '../payPopup/PayPopup';
 
 const FullscreenImage: React.FC<FullscreenImageProps> = ({ imageSrc, isPurchased, imageId, onClose, isMobile, date }) => {
     const [showPopup, setShowPopup] = useState(false);
+    const [showPayPopup, setShowPayPopup] = useState(false);
   
     const togglePopup = () => {
       setShowPopup(!showPopup);
     };
-  
+
+    const togglePayPopup = () => {
+      setShowPayPopup(!showPayPopup);
+    };
+
+    const isBase64 = (str: string) => {
+        const base64Regex = /^data:image\/(png|jpeg|jpg);base64,/;
+        return base64Regex.test(str);
+    };
+
+    useEffect(() => {
+        console.log("Image source: ", imageSrc);
+        console.log("Is base64: ", isBase64(imageSrc));
+    }, [imageSrc]);
+
+    const handleDownloadClick = () => {
+        try {
+            if (isBase64(imageSrc)) {
+                const blob = dataURItoBlob(imageSrc);
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `image_${imageId}.jpeg`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            } else {
+                const a = document.createElement('a');
+                a.href = imageSrc;
+                a.download = `image_${imageId}.jpeg`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+            }
+        } catch (error) {
+            console.error("Download error: ", error);
+        }
+    };
+
     return (
       <FullscreenContainer>
         <CloseButton onClick={onClose}>×</CloseButton>
@@ -28,8 +69,7 @@ const FullscreenImage: React.FC<FullscreenImageProps> = ({ imageSrc, isPurchased
           {isPurchased ? (
             <>
               <DownloadButton 
-                href={URL.createObjectURL(dataURItoBlob(imageSrc))} 
-                download={`image_${imageId}.jpeg`}
+                onClick={handleDownloadClick}
               >
                 <img src={downArrow} alt="svg" style={{width: '24px', height: "21px" }} />Download
               </DownloadButton>
@@ -42,7 +82,7 @@ const FullscreenImage: React.FC<FullscreenImageProps> = ({ imageSrc, isPurchased
               <SeeInFrameButton>See in Frame</SeeInFrameButton>
             </>
           ) : (
-            <UnlockButton>Unlock photos</UnlockButton>
+            <UnlockButton onClick={togglePayPopup}>Unlock photos</UnlockButton>
           )}
         </div>
         {showPopup && (
@@ -54,6 +94,12 @@ const FullscreenImage: React.FC<FullscreenImageProps> = ({ imageSrc, isPurchased
               isPurchased, 
               date 
             }} 
+          />
+        )}
+         {showPayPopup && (
+          <PayPopup 
+            onClose={togglePayPopup} 
+            imageIds={[Number(imageId)]}     
           />
         )}
       </FullscreenContainer>

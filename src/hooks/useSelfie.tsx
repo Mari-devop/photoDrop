@@ -15,7 +15,7 @@ export const useSelfie = () => {
 
   useEffect(() => {
     const handleResize = () => {
-      setIsSmallScreen(window.innerWidth < 500);
+      setIsSmallScreen(window.innerWidth < 501);
     };
 
     window.addEventListener('resize', handleResize);

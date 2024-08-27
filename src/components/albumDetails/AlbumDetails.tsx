@@ -6,6 +6,7 @@ import { Image } from './types';
 import { Container, PhotoGrid, Button } from './AlbumDetails.styled';
 import Footer from '../footer/Footer';
 import FullscreenImage from '../fullScreenImage/FullScreenImage';
+import PayPopup from '../payPopup/PayPopup';
 
 const AlbumDetails: React.FC = () => {
   const { albumId: locationName } = useParams<{ albumId: string }>(); 
@@ -13,6 +14,7 @@ const AlbumDetails: React.FC = () => {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [selectedImage, setSelectedImage] = useState<Image | null>(null);
   const [isMobile, setIsMobile] = useState<boolean>(window.innerWidth < 500);
+  const [showPayPopup, setShowPayPopup] = useState(false);
   const navigate = useNavigate();
   const loadingState = useRef({
     currentPhotoIndex: 0,
@@ -113,16 +115,28 @@ const AlbumDetails: React.FC = () => {
     setSelectedImage(null);
   };
 
+  const areAllImagesPurchased = images.every(image => image.isPurchased);
+
+  const handleUnlockPhotosClick = () => {
+    setShowPayPopup(true);
+  };
+
+  const handlePayPopupClose = () => {
+    setShowPayPopup(false);
+  };
+
   return (
     <Container>
       <PhotoGrid>
         {images.map(image => (
-          <img src={image.binaryString} alt={`Image ${image.id}`} key={image.id} onClick={() => handleImageClick(image)} />
+          <img src={image.binaryString} alt="Pho" key={image.id} onClick={() => handleImageClick(image)} />
         ))}
       </PhotoGrid>
-      <Button>Unlock your photos</Button>
+      {!areAllImagesPurchased && (
+        <Button onClick={handleUnlockPhotosClick}>
+          Unlock your photos
+        </Button> )}
       <Footer />
-
       {isFullscreen && selectedImage && (
         <FullscreenImage 
           imageSrc={selectedImage.binaryString} 
@@ -133,6 +147,14 @@ const AlbumDetails: React.FC = () => {
           date={selectedImage.date}  
         />
       )}
+      {showPayPopup && (
+        <PayPopup 
+          onClose={handlePayPopupClose}
+          imageIds={images.filter(image => !image.isPurchased).map(image => image.id)}
+          showAllPhotosOnly={true}
+        />
+      )}
+
     </Container>
   );
 };

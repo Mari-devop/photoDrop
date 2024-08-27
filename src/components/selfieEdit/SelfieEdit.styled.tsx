@@ -28,6 +28,9 @@ export const SelfieContainer = styled.div`
   box-sizing: border-box;
   overflow-y: auto;
 
+  @media (max-width: 1400px) {
+    height: 570px;
+  }
 
   @media (max-width: 500px) {
     width: 100%;
