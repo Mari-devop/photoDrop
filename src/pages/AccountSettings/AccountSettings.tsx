@@ -6,7 +6,6 @@ import { SettingsContainer, Subtitle, Pencil, RoundButton, TextContainer, TextHo
 import { Title } from '../../styles/Global.styled';
 import { Image, Overlay, CountdownOverlay } from '../Selfie/Selfie.styled'; 
 import SelfiePopup from '../../components/selfiePopup/SelfiePopup';
-import SelfiePopupMobile from '../../components/SelfiePopupMobile/SelfiePopupMobile';
 import SelfieEdit from '../../components/selfieEdit/SelfieEdit';
 import selfiePlaceholder from '../../assets/images/Social.png';
 import pencil from '../../assets/images/pencil.png';
