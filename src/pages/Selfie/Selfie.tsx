@@ -1,9 +1,8 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MainContainer, Title } from '../../styles/Global.styled';
 import { Image, Subtitle, RoundButton, Overlay, CountdownOverlay } from './Selfie.styled';
 import SelfiePopup from '../../components/selfiePopup/SelfiePopup';
-import SelfiePopupMobile from '../../components/SelfiePopupMobile/SelfiePopupMobile';
 import SelfieEdit from '../../components/selfieEdit/SelfieEdit';
 import selfiePlaceholder from '../../assets/images/Social.png';
 import { useSelfie } from '../../hooks/useSelfie';
@@ -25,11 +24,11 @@ const Selfie = () => {
     togglePopup,
     showPopup,
     isSmallScreen,
-    popupRef,
     handleClosePopup,
   } = useSelfie();
 
   const navigate = useNavigate();
+  const photoInputRef = useRef<HTMLInputElement | null>(null);
 
   const onClose = () => {
     setShowSelfieEdit(false);
@@ -39,6 +38,14 @@ const Selfie = () => {
     await saveSelfie(croppedImageArrayBuffer);
     setShowSelfieEdit(false);
     navigate('/account');
+  };
+
+  const handleRoundButtonClick = () => {
+    if (isSmallScreen && photoInputRef.current) {
+      photoInputRef.current.click(); 
+    } else {
+      togglePopup(); 
+    }
   };
 
   useEffect(() => {
@@ -58,12 +65,8 @@ const Selfie = () => {
           alt="selfie" 
           style={{ borderRadius: selfieSrc ? '50%' : '0%' }} 
         />
-        <RoundButton onClick={togglePopup}>+</RoundButton>
-        {showPopup && isSmallScreen && (
-          <div ref={popupRef}>
-            <SelfiePopupMobile onFileUpload={handleFileUpload} onCameraCapture={handleCameraCapture} />
-          </div>
-        )}
+        <RoundButton onClick={handleRoundButtonClick}>+</RoundButton>
+      
         {showPopup && !isSmallScreen && (
           <>
             <Overlay onClick={togglePopup} />
@@ -79,6 +82,13 @@ const Selfie = () => {
           />
         )}
 
+        <input 
+          ref={photoInputRef} 
+          type="file" 
+          style={{ display: 'none' }} 
+          accept="image/*"
+          onChange={(e) => e.target.files && handleFileUpload(e.target.files[0])}
+        />
         <video ref={videoRef} style={{ display: 'none' }} />
         <canvas ref={canvasRef} style={{ display: 'none' }} width={640} height={480} />
       </div>
