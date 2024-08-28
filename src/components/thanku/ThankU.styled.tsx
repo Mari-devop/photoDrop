@@ -5,7 +5,7 @@ export const Container = styled.div`
   justify-content: center;
   flex-direction: column;
   align-items: center;
-  height: 100vh;
+  height: 100%;
   width: 420px;
 `;
 
@@ -50,6 +50,7 @@ export const Button = styled.button`
     line-height: 28px;
     font-weight: 500;
     border: none;
+    border-radius: 25px;
     cursor: pointer;
     margin-bottom: 19px;
 `;

@@ -20,11 +20,16 @@ const PaymentPage: React.FC<PaymentPageProps> = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const { imageIds = [], price = 0 } = location.state || {};
-
+    
     useEffect(() => {
+        if (imageIds.length === 0) {
+            console.error("No image IDs received for payment processing.");
+            return;
+        }
+    
         const fetchClientSecret = async () => {
             const token = localStorage.getItem('authToken');
-
+    
             const response = await fetch('https://photodrop-dawn-surf-6942.fly.dev/client/payment', {
                 method: 'POST',
                 headers: {
@@ -33,14 +38,15 @@ const PaymentPage: React.FC<PaymentPageProps> = () => {
                 },
                 body: JSON.stringify({ imageIds, price }),
             });
-
+    
             const data = await response.json();
             console.log("Received clientSecret:", data.client_secret); 
             setClientSecret(data.client_secret);
         };
-
+    
         fetchClientSecret();
     }, [imageIds, price]);
+    
 
     useEffect(() => {
         if (!clientSecret) return;

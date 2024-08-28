@@ -17,6 +17,9 @@ import {
 } from './PayPopup.styled';
 import payPal from '../../assets/images/payPalLogo.png';
 import applePay from '../../assets/images/applepay.png';
+import { loadStripe } from '@stripe/stripe-js';
+
+const stripePromise = loadStripe("pk_test_51PqIRMRxh50Nc0qLf4KgICJ8Gb4lP7e4iOqZp0SJFlG9rIABwbfH0u09I708ArEEkN3VJ3lzojlUcuvwZ0IYXpcU00E7LfZZkG");
 
 interface PayPopupProps {
     onClose: () => void;
@@ -27,17 +30,18 @@ interface PayPopupProps {
 const PayPopup: React.FC<PayPopupProps> = ({ onClose, imageIds, showAllPhotosOnly = false }) => {
     const [selectedOption, setSelectedOption] = useState('photos');
     const [allImageIds, setAllImageIds] = useState<number[]>([]);
+    const [unpaidPhotoCount, setUnpaidPhotoCount] = useState(0); 
+    const [singleImageId, setSingleImageId] = useState<number | null>(null);
     const navigate = useNavigate();
     const location = useLocation();
-    const albumId = location.pathname.split("/").pop();
-    const searchParams = new URLSearchParams(location.search);
-    const photoCount = parseInt(searchParams.get('photos') || '0');
+    const decodedAlbumId = decodeURIComponent(location.pathname.split("/").pop() || "");
     const pricePerPhoto = 1;
-    const totalPrice = pricePerPhoto * photoCount;
+    const totalPrice = pricePerPhoto * unpaidPhotoCount;
 
     useEffect(() => {
+        const token = localStorage.getItem('authToken');
+
         if (selectedOption === 'photos') {
-            const token = localStorage.getItem('authToken');
             axios.get('https://photodrop-dawn-surf-6942.fly.dev/client/images', {
                 headers: {
                     Authorization: `Bearer ${token}`,
@@ -45,28 +49,76 @@ const PayPopup: React.FC<PayPopupProps> = ({ onClose, imageIds, showAllPhotosOnl
                 }
             })
             .then(response => {
-                const albumData = response.data.find((album: any) => album.location === albumId);
-                if(albumData) {
+                console.log("API Response: ", response.data);
+                const albumData = response.data.find((album: any) => album.location === decodedAlbumId);
+                if (albumData) {
                     const unpurchasedImageIds = albumData.images
                         .filter((image: any) => !image.isPurchased)
                         .map((image: any) => image.id);
-                    setAllImageIds(unpurchasedImageIds);
+                    
+                    if (unpurchasedImageIds.length > 0) {
+                        setAllImageIds(unpurchasedImageIds);
+                        setUnpaidPhotoCount(unpurchasedImageIds.length); 
+                    } else {
+                        console.error("No unpurchased images found in the album.");
+                        setUnpaidPhotoCount(0); 
+                    }
+                } else {
+                    console.error("Album not found for the specified location:", decodedAlbumId);
+                    setUnpaidPhotoCount(0); 
                 }
             })
             .catch(error => {
                 console.error("Error fetching images:", error);
             });
+        } else if (selectedOption === 'photo') {
+            if (imageIds.length === 1) {
+                setSingleImageId(imageIds[0]);
+            } else {
+                console.error("No valid image ID provided for single photo purchase.");
+            }
         }
-    }, [selectedOption, albumId]);
+    }, [selectedOption, decodedAlbumId, imageIds]);
+
+    useEffect(() => {
+        console.log("Selected option:", selectedOption);
+        console.log("Album ID:", decodedAlbumId);
+    
+        if (selectedOption === 'photos' && allImageIds.length === 0) {
+            console.error("No image IDs available after fetching images.");
+        }
+        if (selectedOption === 'photo' && singleImageId === null) {
+            console.error("No single image ID available for purchase.");
+        }
+    }, [allImageIds, singleImageId, selectedOption]);
 
     const handleCheckout = async () => {
-        const selectedImageIds = allImageIds;
-        const selectedPrice = selectedImageIds.length * pricePerPhoto;
+        let selectedImageIds: number[] = [];
+        let selectedPrice = 0;
 
+        if (selectedOption === 'photos') {
+            if (allImageIds.length === 0) {
+                console.error("No image IDs to process the payment.");
+                alert("No images available for purchase.");
+                return;
+            }
+            selectedImageIds = allImageIds;
+            selectedPrice = selectedImageIds.length * pricePerPhoto;
+        } else if (selectedOption === 'photo') {
+            if (singleImageId === null) {
+                console.error("No single image ID to process the payment.");
+                alert("No image available for purchase.");
+                return;
+            }
+            selectedImageIds = [singleImageId];
+            selectedPrice = pricePerPhoto;
+        }
+
+        console.log("Navigating to payment with imageIds:", selectedImageIds);
         navigate('/payment', { state: { imageIds: selectedImageIds, price: selectedPrice } });
-    }
+    };
 
-    const isAlbumDetailsPage = location.pathname.startsWith('/albumDetails') && albumId;
+    const isAlbumDetailsPage = location.pathname.startsWith('/albumDetails') && decodedAlbumId;
 
     return (
         <PayPopupContainer>
@@ -86,7 +138,7 @@ const PayPopup: React.FC<PayPopupProps> = ({ onClose, imageIds, showAllPhotosOnl
                             readOnly
                         />
                         <Label htmlFor="photos">
-                            <span>All {photoCount} photos from {albumId}</span>
+                            <span>All {unpaidPhotoCount} photos from {decodedAlbumId}</span> 
                             <span>${totalPrice}</span>
                         </Label>
                     </Row>
@@ -115,7 +167,7 @@ const PayPopup: React.FC<PayPopupProps> = ({ onClose, imageIds, showAllPhotosOnl
                                     onChange={() => setSelectedOption('photos')}
                                 />
                                 <Label htmlFor="photos">
-                                    <span>All {photoCount} photos from {albumId}</span>
+                                    <span>All {unpaidPhotoCount} photos from {decodedAlbumId}</span> 
                                     <span>${totalPrice}</span>
                                 </Label>
                             </Row>

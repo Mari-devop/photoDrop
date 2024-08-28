@@ -19,7 +19,7 @@ import PayPopup from '../payPopup/PayPopup';
 
 const Navbar = () => {
   const location = useLocation();
-  const albumId = location.pathname.split("/").pop();
+  const albumId = decodeURIComponent(location.pathname.split("/").pop() || "");
   const [selfieSrc, setSelfieSrc] = useState<string | null>(null);
   const [areAllPhotosPurchased, setAreAllPhotosPurchased] = useState(false);
   const [showPayPopup, setShowPayPopup] = useState(false);
