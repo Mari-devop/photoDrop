@@ -13,13 +13,14 @@ const stripePromise = loadStripe("pk_test_51PqIRMRxh50Nc0qLf4KgICJ8Gb4lP7e4iOqZp
 interface PaymentPageProps {
     imageIds?: number[];
     price?: number;
+    paymentMethod?: string;
 }
 
 const PaymentPage: React.FC<PaymentPageProps> = () => {
     const [clientSecret, setClientSecret] = useState<string | null>(null);
     const navigate = useNavigate();
     const location = useLocation();
-    const { imageIds = [], price = 0 } = location.state || {};
+    const { imageIds = [], price = 0, paymentMethod } = location.state || {};
     
     useEffect(() => {
         if (imageIds.length === 0) {
@@ -36,7 +37,7 @@ const PaymentPage: React.FC<PaymentPageProps> = () => {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`,
                 },
-                body: JSON.stringify({ imageIds, price }),
+                body: JSON.stringify({ imageIds, price, paymentMethod }),
             });
     
             const data = await response.json();
@@ -45,7 +46,7 @@ const PaymentPage: React.FC<PaymentPageProps> = () => {
         };
     
         fetchClientSecret();
-    }, [imageIds, price]);
+    }, [imageIds, price, paymentMethod]);
     
 
     useEffect(() => {

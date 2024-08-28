@@ -17,9 +17,6 @@ import {
 } from './PayPopup.styled';
 import payPal from '../../assets/images/payPalLogo.png';
 import applePay from '../../assets/images/applepay.png';
-import { loadStripe } from '@stripe/stripe-js';
-
-const stripePromise = loadStripe("pk_test_51PqIRMRxh50Nc0qLf4KgICJ8Gb4lP7e4iOqZp0SJFlG9rIABwbfH0u09I708ArEEkN3VJ3lzojlUcuvwZ0IYXpcU00E7LfZZkG");
 
 interface PayPopupProps {
     onClose: () => void;
@@ -92,7 +89,7 @@ const PayPopup: React.FC<PayPopupProps> = ({ onClose, imageIds, showAllPhotosOnl
         }
     }, [allImageIds, singleImageId, selectedOption]);
 
-    const handleCheckout = async () => {
+    const handleCheckout = async (paymentMethod: string) => {
         let selectedImageIds: number[] = [];
         let selectedPrice = 0;
 
@@ -115,7 +112,7 @@ const PayPopup: React.FC<PayPopupProps> = ({ onClose, imageIds, showAllPhotosOnl
         }
 
         console.log("Navigating to payment with imageIds:", selectedImageIds);
-        navigate('/payment', { state: { imageIds: selectedImageIds, price: selectedPrice } });
+        navigate('/payment', { state: { imageIds: selectedImageIds, price: selectedPrice, paymentMethod } });
     };
 
     const isAlbumDetailsPage = location.pathname.startsWith('/albumDetails') && decodedAlbumId;
@@ -175,12 +172,12 @@ const PayPopup: React.FC<PayPopupProps> = ({ onClose, imageIds, showAllPhotosOnl
                     </>
                 )}
                
-               <ButtonMobile>
+               <ButtonMobile onClick={() => handleCheckout('card')}>
                     <img src={applePay} alt="Apple Pay" />
                 </ButtonMobile>
                 <ButtonContainer>
-                    <Button onClick={handleCheckout}>Checkout</Button>
-                    <ButtonPayPal>
+                    <Button onClick={() => handleCheckout('card')}>Checkout</Button>
+                    <ButtonPayPal onClick={() => handleCheckout('paypal')}>
                         <img src={payPal} alt="PayPal" />
                     </ButtonPayPal>
                 </ButtonContainer>
