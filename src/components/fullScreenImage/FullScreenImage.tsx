@@ -12,12 +12,18 @@ import downArrow from '../../assets/images/downArrow.png';
 import share from '../../assets/images/share.png';
 import { dataURItoBlob } from '../../utils/ConverFunc';
 import PayPopup from '../payPopup/PayPopup';
+import SharePopup from '../sharePopup/SharePopup';
 
 const FullscreenImage: React.FC<FullscreenImageProps> = ({ imageSrc, isPurchased, imageId, onClose, isMobile, date }) => {
     const [showPayPopup, setShowPayPopup] = useState(false);
+    const [showPopup, setShowPopup] = useState(false);
 
     const togglePayPopup = () => {
       setShowPayPopup(!showPayPopup);
+    };
+
+    const togglePopup = () => {
+      setShowPopup(!showPopup);
     };
 
     const isBase64 = (str: string) => {
@@ -56,16 +62,8 @@ const FullscreenImage: React.FC<FullscreenImageProps> = ({ imageSrc, isPurchased
     };
 
     const handleShareClick = () => {
-      if (isMobile && navigator.share) {
-          navigator.share({
-              title: 'image-name',
-              text: 'Check out this photo!',
-              url: imageSrc,
-          })
-          .then(() => console.log('Successful share'))
-          .catch((error) => console.log('Error sharing:', error));
-      } 
-  };
+        togglePopup();
+    };
 
 
     return (

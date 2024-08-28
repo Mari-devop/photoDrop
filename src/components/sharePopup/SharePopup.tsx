@@ -2,9 +2,9 @@ import React from 'react';
 import { dataURItoBlob } from '../../utils/ConverFunc';
 import { SharePopupProps } from './types';
 import { ShareContainer, Image, Row  } from './SharePopup.styled';
-import share from '../../assets/images/arrowupicon.png';
-import download from '../../assets/images/arrowdownicon.png';
-import folder from '../../assets/images/filesicon.png';
+import shareIcon from '../../assets/images/arrowupicon.png';
+import downloadIcon from '../../assets/images/arrowdownicon.png';
+import copyIcon from '../../assets/images/filesicon.png';
 
 const SharePopup = ({ selectedImage, onClose }: SharePopupProps) => {
 
@@ -18,7 +18,7 @@ const SharePopup = ({ selectedImage, onClose }: SharePopupProps) => {
             .then(() => console.log('Successful share'))
             .catch((error) => console.log('Error sharing:', error));
     } else {
-        console.log('Web Share API not supported');
+        console.log('Web Share API not supported or selectedImage is null.');
     }
   }
 
@@ -39,33 +39,32 @@ const SharePopup = ({ selectedImage, onClose }: SharePopupProps) => {
   };
 
   const handleCopyClick = () => {
-    if (navigator.clipboard && selectedImage) {
+    if (selectedImage && navigator.clipboard) {
         navigator.clipboard.writeText(selectedImage.binaryString)
             .then(() => console.log('Base64 image string copied to clipboard'))
             .catch((err) => console.error('Could not copy image string: ', err));
     } else {
-        console.log('Clipboard API is not supported in your browser.');
+        console.log('Clipboard API is not supported in your browser or selectedImage is null.');
     }
-};
+  };
 
   return (
     <ShareContainer>
       <Row onClick={handleShareClick}>
         <p>Share...</p>
-        <Image src={share} alt="photos" />
+        <Image src={shareIcon} alt="share" />
       </Row>
       <Row onClick={handleAddToPhotos}>
-        <p>Add To Photo</p>
-        <Image src={download} alt="camera" />
+        <p>Add To Photos</p>
+        <Image src={downloadIcon} alt="add to photos" />
       </Row>
       <Row onClick={handleCopyClick}>
         <p>Copy</p>
-        <Image src={folder} alt="folder" />
+        <Image src={copyIcon} alt="copy" />
       </Row>
+      <button onClick={onClose}>Close</button>
     </ShareContainer>
   );
 };
 
 export default SharePopup;
-
-
