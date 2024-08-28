@@ -16,7 +16,7 @@ import {
     ButtonMobile
 } from './PayPopup.styled';
 import payPal from '../../assets/images/payPalLogo.png';
-import applePay from '../../assets/images/applepay.png';
+import ApplePay from '../ApplePay/ApplePay';
 
 interface PayPopupProps {
     onClose: () => void;
@@ -172,7 +172,7 @@ const PayPopup: React.FC<PayPopupProps> = ({ onClose, imageIds, showAllPhotosOnl
                     </>
                 )}
                
-    
+                <ApplePay />
                 <ButtonContainer>
                     <Button onClick={() => handleCheckout('card')}>Checkout</Button>
                     <ButtonPayPal onClick={() => handleCheckout('paypal')}>
