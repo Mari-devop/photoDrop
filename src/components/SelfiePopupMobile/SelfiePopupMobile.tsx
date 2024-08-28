@@ -14,15 +14,15 @@ const SelfiePopupMobile = ({ onFileUpload, onCameraCapture }: SelfiePopupMobileP
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const cameraInputRef = useRef<HTMLInputElement | null>(null);
 
-  const handleFileUploadClick = () => {
-    if (fileInputRef.current) {
-      fileInputRef.current.click();
-    }
-  };
-
   const handlePhotoLibraryClick = () => {
     if (photoInputRef.current) {
       photoInputRef.current.click();
+    }
+  };
+
+  const handleFileUploadClick = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
     }
   };
 
@@ -31,7 +31,6 @@ const SelfiePopupMobile = ({ onFileUpload, onCameraCapture }: SelfiePopupMobileP
       cameraInputRef.current.click();
     }
   };
-
 
   return (
     <MobileContainer>
@@ -47,6 +46,8 @@ const SelfiePopupMobile = ({ onFileUpload, onCameraCapture }: SelfiePopupMobileP
         <p>Choose File</p>
         <Image src={folder} alt="folder" />
       </Row>
+
+
       <input 
         ref={photoInputRef} 
         type="file" 
@@ -54,6 +55,8 @@ const SelfiePopupMobile = ({ onFileUpload, onCameraCapture }: SelfiePopupMobileP
         accept="image/*" 
         onChange={(e) => e.target.files && onFileUpload(e.target.files[0])} 
       />
+
+
       <input 
         ref={cameraInputRef} 
         type="file" 
@@ -62,6 +65,8 @@ const SelfiePopupMobile = ({ onFileUpload, onCameraCapture }: SelfiePopupMobileP
         capture="environment" 
         onChange={(e) => e.target.files && onFileUpload(e.target.files[0])} 
       />
+
+
       <input 
         ref={fileInputRef} 
         type="file" 
