@@ -10,7 +10,9 @@ interface SelfiePopupMobileProps {
 }
 
 const SelfiePopupMobile = ({ onFileUpload, onCameraCapture }: SelfiePopupMobileProps) => {
+  const photoInputRef = useRef<HTMLInputElement | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const cameraInputRef = useRef<HTMLInputElement | null>(null);
 
   const handleFileUploadClick = () => {
     if (fileInputRef.current) {
@@ -18,13 +20,26 @@ const SelfiePopupMobile = ({ onFileUpload, onCameraCapture }: SelfiePopupMobileP
     }
   };
 
+  const handlePhotoLibraryClick = () => {
+    if (photoInputRef.current) {
+      photoInputRef.current.click();
+    }
+  };
+
+  const handleCameraCaptureClick = () => {
+    if (cameraInputRef.current) {
+      cameraInputRef.current.click();
+    }
+  };
+
+
   return (
     <MobileContainer>
-      <Row onClick={handleFileUploadClick}>
+      <Row onClick={handlePhotoLibraryClick}>
         <p>Photo Library</p>
         <Image src={photos} alt="photos" />
       </Row>
-      <Row onClick={onCameraCapture}>
+      <Row onClick={handleCameraCaptureClick}>
         <p>Take Photo</p>
         <Image src={camera} alt="camera" />
       </Row>
@@ -33,11 +48,24 @@ const SelfiePopupMobile = ({ onFileUpload, onCameraCapture }: SelfiePopupMobileP
         <Image src={folder} alt="folder" />
       </Row>
       <input 
-        ref={fileInputRef} 
+        ref={photoInputRef} 
         type="file" 
         style={{ display: 'none' }} 
         accept="image/*" 
-        capture
+        onChange={(e) => e.target.files && onFileUpload(e.target.files[0])} 
+      />
+      <input 
+        ref={cameraInputRef} 
+        type="file" 
+        style={{ display: 'none' }} 
+        accept="image/*" 
+        capture="environment" 
+        onChange={(e) => e.target.files && onFileUpload(e.target.files[0])} 
+      />
+      <input 
+        ref={fileInputRef} 
+        type="file" 
+        style={{ display: 'none' }} 
         onChange={(e) => e.target.files && onFileUpload(e.target.files[0])} 
       />
     </MobileContainer>
