@@ -76,6 +76,7 @@ export const Title = styled.h1`
     @media (max-width: 525px) {
         margin-top: 0;
         margin-bottom: 0;
+        margin-left: 0;
     }
 `;
 
@@ -118,12 +119,13 @@ export const Wrapper = styled.div`
   flex-grow: 1; 
   display: flex;
   align-items: center; 
-  margin-left: 20px; 
+  margin-left: 30px; 
   flex-direction: row;
   justify-content: flex-start;
 
     @media (max-width: 525px) {
         flex-direction: column;
+        margin-left: 30px; 
     }
 `;
 

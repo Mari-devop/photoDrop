@@ -7,6 +7,10 @@ export const Container = styled.div`
   align-items: center;
   height: 100%;
   width: 420px;
+
+    @media (max-width: 500px) {
+        width: 344px;
+    }
 `;
 
 export const Subtitle = styled.p`
