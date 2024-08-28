@@ -172,9 +172,7 @@ const PayPopup: React.FC<PayPopupProps> = ({ onClose, imageIds, showAllPhotosOnl
                     </>
                 )}
                
-               <ButtonMobile onClick={() => handleCheckout('card')}>
-                    <img src={applePay} alt="Apple Pay" />
-                </ButtonMobile>
+    
                 <ButtonContainer>
                     <Button onClick={() => handleCheckout('card')}>Checkout</Button>
                     <ButtonPayPal onClick={() => handleCheckout('paypal')}>
