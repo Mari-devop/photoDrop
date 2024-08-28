@@ -41,7 +41,7 @@ const ApplePay = () => {
             'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
           },
           body: JSON.stringify({
-            paymentMethodType: 'card', 
+            paymentMethodType: 'apple-pay', 
             currency: 'usd',
             amount: 100, 
           }),
