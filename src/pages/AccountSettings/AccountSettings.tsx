@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import axios from 'axios';
 import { Link, useNavigate } from 'react-router-dom'; 
 import { useSelfie } from '../../hooks/useSelfie';
@@ -33,6 +33,8 @@ const AccountSettings = () => {
     isCountingDown,
     countdown,
   } = useSelfie();
+
+  const photoInputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
     const fetchSelfie = async () => {
@@ -81,6 +83,14 @@ const AccountSettings = () => {
     setShowSelfieEdit(false);
   };
 
+  const handleRoundButtonClick = () => {
+    if (isSmallScreen && photoInputRef.current) {
+      photoInputRef.current.click(); 
+    } else {
+      togglePopup(); 
+    }
+  };
+
   return (
     <SettingsContainer>
       <Title>Welcome</Title>
@@ -91,12 +101,8 @@ const AccountSettings = () => {
           alt="selfie" 
           style={{ borderRadius: selfieSrc ? '50%' : '0%' }} 
         />
-        <RoundButton onClick={togglePopup}><Pencil src={pencil} alt="pencil" /></RoundButton>
-        {showPopup && isSmallScreen && (
-          <div ref={popupRef}>
-            <SelfiePopupMobile onFileUpload={handleFileUpload} onCameraCapture={handleCameraCapture} />
-          </div>
-        )}
+        <RoundButton onClick={handleRoundButtonClick}><Pencil src={pencil} alt="pencil" /></RoundButton>
+      
         {showPopup && !isSmallScreen && (
           <>
             <Overlay onClick={togglePopup} />
@@ -112,6 +118,13 @@ const AccountSettings = () => {
           />
         )}
 
+        <input 
+          ref={photoInputRef} 
+          type="file" 
+          style={{ display: 'none' }} 
+          accept="image/*"
+          onChange={(e) => e.target.files && handleFileUpload(e.target.files[0])}
+        />
         <video ref={videoRef} style={{ display: 'none' }} />
         <canvas ref={canvasRef} style={{ display: 'none' }} width={640} height={480} />
       </div>
