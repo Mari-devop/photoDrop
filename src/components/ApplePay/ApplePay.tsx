@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { PaymentRequestButtonElement, useStripe, useElements } from '@stripe/react-stripe-js';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 const ApplePay = () => {
   const stripe = useStripe();
   const elements = useElements();
   const [paymentRequest, setPaymentRequest] = useState<any>(null);
   const navigate = useNavigate();
+  const location = useLocation();
+  const { imageIds = [] } = location.state || {};
 
   useEffect(() => {
     if (!stripe || !elements) {
@@ -41,6 +43,7 @@ const ApplePay = () => {
             'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
           },
           body: JSON.stringify({
+            imageIds,
             paymentMethodType: 'apple-pay',
             currency: 'usd',
             amount: 100, 
@@ -72,10 +75,10 @@ const ApplePay = () => {
         console.error('Payment failed:', error);
       }
     });
-  }, [stripe, elements, navigate]);
+  }, [stripe, elements, navigate, imageIds]);
 
   return paymentRequest ? (
-    <div style={{ width: '100%', maxWidth: '500px', margin: '0 auto', padding: '20px',  borderRadius: '100px', overflow: 'hidden',  }}>
+    <div style={{ width: '100%', maxWidth: '490px', margin: '0 auto', padding: '10px',  borderRadius: '100px', overflow: 'hidden', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
       <PaymentRequestButtonElement 
         options={{ 
           paymentRequest,
