@@ -75,18 +75,20 @@ const ApplePay = () => {
   }, [stripe, elements, navigate]);
 
   return paymentRequest ? (
-    <PaymentRequestButtonElement 
-      options={{ 
-        paymentRequest,
-        style: {
-          paymentRequestButton: {
-            type: 'buy', 
-            theme: 'dark', 
-            height: '48px', 
+    <div style={{ width: '100%', maxWidth: '400px', margin: '0 auto' }}>
+      <PaymentRequestButtonElement 
+        options={{ 
+          paymentRequest,
+          style: {
+            paymentRequestButton: {
+              type: 'buy', 
+              theme: 'dark', 
+              height: '48px', 
+            },
           },
-        },
-      }} 
-    />
+        }} 
+      />
+    </div>
   ) : null;
 };
 
