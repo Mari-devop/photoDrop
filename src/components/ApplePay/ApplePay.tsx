@@ -75,13 +75,13 @@ const ApplePay = () => {
   }, [stripe, elements, navigate]);
 
   return paymentRequest ? (
-    <div style={{ width: '100%', maxWidth: '400px', margin: '0 auto', padding: '20px',  borderRadius: '12px', overflow: 'hidden',  }}>
+    <div style={{ width: '100%', maxWidth: '500px', margin: '0 auto', padding: '20px',  borderRadius: '100px', overflow: 'hidden',  }}>
       <PaymentRequestButtonElement 
         options={{ 
           paymentRequest,
           style: {
             paymentRequestButton: {
-              type: 'buy', 
+              type: 'default', 
               theme: 'dark', 
               height: '48px', 
             },
