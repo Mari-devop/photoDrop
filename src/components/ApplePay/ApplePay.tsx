@@ -18,22 +18,22 @@ const ApplePay = () => {
       currency: 'usd',
       total: {
         label: 'Total',
-        amount: 100, 
+        amount: 100, // $1.00 in USD
       },
       requestPayerName: true,
       requestPayerEmail: true,
     });
 
-  
     pr.canMakePayment().then((result) => {
       if (result) {
         setPaymentRequest(pr);
+      } else {
+        console.error('Apple Pay is not available.');
       }
     });
 
     pr.on('paymentmethod', async (e) => {
       try {
-      
         const response = await fetch('https://photodrop-dawn-surf-6942.fly.dev/client/payment', {
           method: 'POST',
           headers: {
@@ -41,9 +41,9 @@ const ApplePay = () => {
             'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
           },
           body: JSON.stringify({
-            paymentMethodType: 'apple-pay', 
+            paymentMethodType: 'apple-pay',
             currency: 'usd',
-            amount: 100, 
+            amount: 100, // $1.00 in USD
           }),
         });
 
@@ -54,7 +54,6 @@ const ApplePay = () => {
           return;
         }
 
-
         const { error: stripeError, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
           payment_method: e.paymentMethod.id,
         }, { handleActions: false });
@@ -64,7 +63,6 @@ const ApplePay = () => {
           return;
         }
 
-    
         if (paymentIntent && paymentIntent.status === 'succeeded') {
           navigate('/success');
         } else {
@@ -76,12 +74,11 @@ const ApplePay = () => {
     });
   }, [stripe, elements, navigate]);
 
-  return (
-    <>
-      {paymentRequest && <PaymentRequestButtonElement options={{ paymentRequest }} />}
-    </>
+  return paymentRequest ? (
+    <PaymentRequestButtonElement options={{ paymentRequest }} />
+  ) : (
+    <div>Apple Pay is not available</div>
   );
 };
 
 export default ApplePay;
-
