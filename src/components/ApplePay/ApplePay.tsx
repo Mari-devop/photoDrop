@@ -18,7 +18,7 @@ const ApplePay = () => {
       currency: 'usd',
       total: {
         label: 'Total',
-        amount: 100, // $1.00 in USD
+        amount: 100, 
       },
       requestPayerName: true,
       requestPayerEmail: true,
@@ -75,10 +75,19 @@ const ApplePay = () => {
   }, [stripe, elements, navigate]);
 
   return paymentRequest ? (
-    <PaymentRequestButtonElement options={{ paymentRequest }} />
-  ) : (
-    <div>Apple Pay is not available</div>
-  );
+    <PaymentRequestButtonElement 
+      options={{ 
+        paymentRequest,
+        style: {
+          paymentRequestButton: {
+            type: 'buy', 
+            theme: 'dark', 
+            height: '48px', 
+          },
+        },
+      }} 
+    />
+  ) : null;
 };
 
 export default ApplePay;
