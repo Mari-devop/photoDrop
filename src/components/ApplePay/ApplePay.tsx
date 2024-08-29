@@ -43,7 +43,7 @@ const ApplePay = () => {
           body: JSON.stringify({
             paymentMethodType: 'apple-pay',
             currency: 'usd',
-            amount: 100, // $1.00 in USD
+            amount: 100, 
           }),
         });
 
@@ -75,7 +75,7 @@ const ApplePay = () => {
   }, [stripe, elements, navigate]);
 
   return paymentRequest ? (
-    <div style={{ width: '100%', maxWidth: '400px', margin: '0 auto' }}>
+    <div style={{ width: '100%', maxWidth: '400px', margin: '0 auto', padding: '20px',  borderRadius: '12px', overflow: 'hidden',  }}>
       <PaymentRequestButtonElement 
         options={{ 
           paymentRequest,
