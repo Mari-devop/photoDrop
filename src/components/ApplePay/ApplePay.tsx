@@ -20,7 +20,7 @@ const ApplePay = () => {
       currency: 'usd',
       total: {
         label: 'Total',
-        amount: 100, 
+        amount: imageIds.length * 100, 
       },
       requestPayerName: true,
       requestPayerEmail: true,
@@ -46,7 +46,6 @@ const ApplePay = () => {
             imageIds,
             paymentMethodType: 'apple-pay',
             currency: 'usd',
-            amount: 100, 
           }),
         });
 
@@ -75,10 +74,10 @@ const ApplePay = () => {
         console.error('Payment failed:', error);
       }
     });
-  }, [stripe, elements, navigate, imageIds]);
+  }, [stripe, elements, navigate, imageIds, paymentRequest]);
 
   return paymentRequest ? (
-    <div style={{ width: '100%', maxWidth: '490px', margin: '0 auto', padding: '10px',  borderRadius: '100px', overflow: 'hidden' }}>
+    <div style={{ width: '100%', maxWidth: '460px', margin: '0 auto', padding: '10px',  borderRadius: '100px', overflow: 'hidden' }}>
       <PaymentRequestButtonElement 
         options={{ 
           paymentRequest,
