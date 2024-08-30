@@ -6,7 +6,7 @@ import shareIcon from '../../assets/images/arrowupicon.png';
 import downloadIcon from '../../assets/images/arrowdownicon.png';
 import copyIcon from '../../assets/images/filesicon.png';
 
-const SharePopup = ({ selectedImage, onClose }: SharePopupProps) => {
+const SharePopup = ({ selectedImage }: SharePopupProps) => {
 
   const handleShareClick = async () => {
     if (selectedImage && navigator.share) {
@@ -19,7 +19,7 @@ const SharePopup = ({ selectedImage, onClose }: SharePopupProps) => {
                 url: url,
             });
             console.log('Successful share');
-            URL.revokeObjectURL(url); 
+            URL.revokeObjectURL(url); // Clean up after sharing
         } catch (error) {
             console.log('Error sharing:', error);
         }
@@ -36,7 +36,7 @@ const SharePopup = ({ selectedImage, onClose }: SharePopupProps) => {
         a.href = url;
         a.download = `image_${selectedImage.id}.jpeg`;
         a.click();
-        URL.revokeObjectURL(url);  
+        URL.revokeObjectURL(url);  // Clean up
     }
   };
 
@@ -54,16 +54,16 @@ const SharePopup = ({ selectedImage, onClose }: SharePopupProps) => {
   };
 
   return (
-    <ShareContainer>
-      <Row onClick={handleShareClick}>
+    <ShareContainer style={{ zIndex: 1000, position: 'relative' }}> {/* Ensure the popup is on top */}
+      <Row onClick={handleShareClick} style={{ backgroundColor: 'lightgrey', padding: '10px', cursor: 'pointer' }}> {/* Debugging styles */}
         <p>Share...</p>
         <Image src={shareIcon} alt="share" />
       </Row>
-      <Row onClick={handleAddToPhotos}>
+      <Row onClick={handleAddToPhotos} style={{ backgroundColor: 'lightgrey', padding: '10px', cursor: 'pointer' }}> {/* Debugging styles */}
         <p>Add To Photos</p>
         <Image src={downloadIcon} alt="add to photos" />
       </Row>
-      <Row onClick={handleCopyClick}>
+      <Row onClick={handleCopyClick} style={{ backgroundColor: 'lightgrey', padding: '10px', cursor: 'pointer' }}> {/* Debugging styles */}
         <p>Copy</p>
         <Image src={copyIcon} alt="copy" />
       </Row>
