@@ -10,13 +10,16 @@ const SharePopup = ({ selectedImage, onClose }: SharePopupProps) => {
 
   const handleShareClick = () => {
     if (selectedImage && navigator.share) {
+        const blob = dataURItoBlob(selectedImage.binaryString);
+        const url = URL.createObjectURL(blob);
+
         navigator.share({
             title: 'image-name',
             text: 'Check out this photo!',
-            url: selectedImage.binaryString,
+            url: url,
         })
-            .then(() => console.log('Successful share'))
-            .catch((error) => console.log('Error sharing:', error));
+        .then(() => console.log('Successful share'))
+        .catch((error) => console.log('Error sharing:', error));
     } else {
         console.log('Web Share API not supported or selectedImage is null.');
     }
@@ -24,17 +27,13 @@ const SharePopup = ({ selectedImage, onClose }: SharePopupProps) => {
 
   const handleAddToPhotos = () => {
     if (selectedImage) {
-        if (selectedImage.binaryString.startsWith('data:image')) {
-            const a = document.createElement('a');
-            a.href = URL.createObjectURL(dataURItoBlob(selectedImage.binaryString));
-            a.download = `image_${selectedImage.id}.jpeg`;
-            a.click();
-        } else {
-            const a = document.createElement('a');
-            a.href = selectedImage.binaryString;
-            a.download = `image_${selectedImage.id}.jpeg`;
-            a.click();
-        }
+        const blob = dataURItoBlob(selectedImage.binaryString);
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `image_${selectedImage.id}.jpeg`;
+        a.click();
+        URL.revokeObjectURL(url);  // Clean up
     }
   };
 

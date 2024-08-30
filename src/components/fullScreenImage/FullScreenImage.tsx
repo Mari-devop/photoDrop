@@ -11,19 +11,20 @@ import { UnlockButton } from '../accountFullData/AccountFullData.styled';
 import downArrow from '../../assets/images/downArrow.png';
 import share from '../../assets/images/share.png';
 import PayPopup from '../payPopup/PayPopup';
+import SharePopup from '../sharePopup/SharePopup';  
 import { dataURItoBlob } from '../../utils/ConverFunc';
 
 const FullscreenImage: React.FC<FullscreenImageProps> = ({ imageSrc, isPurchased, imageId, onClose, isMobile, date }) => {
     const [showPayPopup, setShowPayPopup] = useState(false);
-    const [showPopup, setShowPopup] = useState(false);
+    const [showSharePopup, setShowSharePopup] = useState(false); 
     const imgRef = useRef<HTMLImageElement>(null);
 
     const togglePayPopup = () => {
       setShowPayPopup(!showPayPopup);
     };
 
-    const togglePopup = () => {
-      setShowPopup(!showPopup);
+    const toggleSharePopup = () => {
+      setShowSharePopup(!showSharePopup);  
     };
 
     const isBase64 = (str: string) => {
@@ -72,12 +73,6 @@ const FullscreenImage: React.FC<FullscreenImageProps> = ({ imageSrc, isPurchased
         }
     };
 
-    const handleShareClick = () => {
-        if (imgRef.current) {
-            imgRef.current.click(); 
-        }
-    };
-
     return (
         <FullscreenContainer>
             <CloseButton onClick={onClose}>×</CloseButton>
@@ -96,7 +91,7 @@ const FullscreenImage: React.FC<FullscreenImageProps> = ({ imageSrc, isPurchased
                             <img src={downArrow} alt="svg" style={{width: '24px', height: "21px" }} />Download
                         </DownloadButton>
                         {isMobile && (
-                            <ShareButton onClick={handleShareClick}>
+                            <ShareButton onClick={toggleSharePopup}>  
                                 <img src={share} alt="svg" />
                                 Share
                             </ShareButton>
@@ -113,6 +108,17 @@ const FullscreenImage: React.FC<FullscreenImageProps> = ({ imageSrc, isPurchased
                     imageIds={[Number(imageId)]}     
                 />
             )}
+          {showSharePopup && (
+            <SharePopup 
+                selectedImage={{ 
+                    binaryString: imageSrc, 
+                    id: Number(imageId), 
+                    isPurchased,           
+                    date                   
+                }}  
+                onClose={toggleSharePopup}  
+            />
+        )}
         </FullscreenContainer>
     );
 };
