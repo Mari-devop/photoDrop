@@ -33,6 +33,7 @@ export const Row = styled.div`
     padding-bottom: 5px;
     padding-left: 14px;
     padding-right: 9px;
+    cursor: pointer;  
 
   &:last-of-type {
         border-bottom: none;
