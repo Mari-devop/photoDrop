@@ -122,7 +122,20 @@ const AlbumDetails: React.FC = () => {
 
   const handlePayPopupClose = () => {
     setShowPayPopup(false);
+    if (images.some(image => image.isPurchased)) {
+      handlePurchaseCompletion();
+    }
   };
+
+  const handlePurchaseCompletion = () => {
+    navigate('/thankyou', {
+      state: {
+        albumName: locationName, 
+        purchasedPhotos: images.filter(image => image.isPurchased) 
+      }
+    });
+  };
+  
 
   return (
     <Container>
