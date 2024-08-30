@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import { FullscreenImageProps } from './types';
 import { 
   CloseButton, 
@@ -16,6 +16,7 @@ import { dataURItoBlob } from '../../utils/ConverFunc';
 const FullscreenImage: React.FC<FullscreenImageProps> = ({ imageSrc, isPurchased, imageId, onClose, isMobile, date }) => {
     const [showPayPopup, setShowPayPopup] = useState(false);
     const [showPopup, setShowPopup] = useState(false);
+    const imgRef = useRef<HTMLImageElement>(null);
 
     const togglePayPopup = () => {
       setShowPayPopup(!showPayPopup);
@@ -33,11 +34,6 @@ const FullscreenImage: React.FC<FullscreenImageProps> = ({ imageSrc, isPurchased
     const bufferToBlob = (buffer: ArrayBuffer, mimeType: string): Blob => {
         return new Blob([buffer], { type: mimeType });
     };
-
-    useEffect(() => {
-        console.log("Image source: ", imageSrc);
-        console.log("Is base64: ", isBase64(imageSrc));
-    }, [imageSrc]);
 
     const handleDownloadClick = () => {
         try {
@@ -76,55 +72,17 @@ const FullscreenImage: React.FC<FullscreenImageProps> = ({ imageSrc, isPurchased
         }
     };
 
-    const handleShareClick = async () => {
-        if (navigator.share) {
-            try {
-                let shareData: { title: string; text: string; files?: File[] } = {
-                    title: 'Check out this photo',
-                    text: 'Here is a photo from the album.',
-                };
-    
-                if (typeof imageSrc === 'string') {
-                    // If imageSrc is a URL or base64, we handle it differently
-                    if (isBase64(imageSrc)) {
-                        const blob = dataURItoBlob(imageSrc);
-                        const file = new File([blob], `image_${imageId}.jpeg`, { type: 'image/jpeg' });
-                        shareData.files = [file];
-                    } else {
-                        // Sharing as a URL instead of Blob
-                        const response = await fetch(imageSrc);
-                        const blob = await response.blob();
-                        const file = new File([blob], `image_${imageId}.jpeg`, { type: blob.type });
-                        shareData.files = [file];
-                    }
-                } else if (imageSrc && typeof imageSrc === 'object' && 'byteLength' in imageSrc) {
-                    // If it's an ArrayBuffer, convert and share as a file
-                    const blob = bufferToBlob(imageSrc, 'image/jpeg');
-                    const file = new File([blob], `image_${imageId}.jpeg`, { type: 'image/jpeg' });
-                    shareData.files = [file];
-                }
-    
-                if (shareData.files && shareData.files.length > 0) {
-                    await navigator.share(shareData);
-                    console.log('Sharing succeeded');
-                } else {
-                    console.error('No valid files to share.');
-                }
-            } catch (error) {
-                console.error('Sharing failed', error);
-            }
-        } else {
-            console.log('Web Share API is not supported in this browser.');
-            togglePopup(); 
+    const handleShareClick = () => {
+        if (imgRef.current) {
+            imgRef.current.click(); 
         }
     };
-    
-    
 
     return (
         <FullscreenContainer>
             <CloseButton onClick={onClose}>×</CloseButton>
             <img 
+                ref={imgRef}
                 src={typeof imageSrc === 'string' 
                     ? imageSrc 
                     : URL.createObjectURL(bufferToBlob(imageSrc as ArrayBuffer, 'image/jpeg'))} 
