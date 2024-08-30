@@ -1,29 +1,32 @@
 import React from 'react';
 import { dataURItoBlob } from '../../utils/ConverFunc';
 import { SharePopupProps } from './types';
-import { ShareContainer, Image, Row  } from './SharePopup.styled';
+import { ShareContainer, Image, Row } from './SharePopup.styled';
 import shareIcon from '../../assets/images/arrowupicon.png';
 import downloadIcon from '../../assets/images/arrowdownicon.png';
 import copyIcon from '../../assets/images/filesicon.png';
 
 const SharePopup = ({ selectedImage, onClose }: SharePopupProps) => {
 
-  const handleShareClick = () => {
+  const handleShareClick = async () => {
     if (selectedImage && navigator.share) {
-        const blob = dataURItoBlob(selectedImage.binaryString);
-        const url = URL.createObjectURL(blob);
+        try {
+            const blob = dataURItoBlob(selectedImage.binaryString);
+            const url = URL.createObjectURL(blob);
 
-        navigator.share({
-            title: 'image-name',
-            text: 'Check out this photo!',
-            url: url,
-        })
-        .then(() => console.log('Successful share'))
-        .catch((error) => console.log('Error sharing:', error));
+            await navigator.share({
+                title: 'Check out this photo!',
+                url: url,
+            });
+            console.log('Successful share');
+            URL.revokeObjectURL(url); 
+        } catch (error) {
+            console.log('Error sharing:', error);
+        }
     } else {
         console.log('Web Share API not supported or selectedImage is null.');
     }
-  }
+  };
 
   const handleAddToPhotos = () => {
     if (selectedImage) {
@@ -33,15 +36,18 @@ const SharePopup = ({ selectedImage, onClose }: SharePopupProps) => {
         a.href = url;
         a.download = `image_${selectedImage.id}.jpeg`;
         a.click();
-        URL.revokeObjectURL(url);  // Clean up
+        URL.revokeObjectURL(url);  
     }
   };
 
-  const handleCopyClick = () => {
+  const handleCopyClick = async () => {
     if (selectedImage && navigator.clipboard) {
-        navigator.clipboard.writeText(selectedImage.binaryString)
-            .then(() => console.log('Base64 image string copied to clipboard'))
-            .catch((err) => console.error('Could not copy image string: ', err));
+        try {
+            await navigator.clipboard.writeText(selectedImage.binaryString);
+            console.log('Base64 image string copied to clipboard');
+        } catch (err) {
+            console.error('Could not copy image string: ', err);
+        }
     } else {
         console.log('Clipboard API is not supported in your browser or selectedImage is null.');
     }
@@ -61,7 +67,6 @@ const SharePopup = ({ selectedImage, onClose }: SharePopupProps) => {
         <p>Copy</p>
         <Image src={copyIcon} alt="copy" />
       </Row>
-      <button onClick={onClose}>Close</button>
     </ShareContainer>
   );
 };
