@@ -78,40 +78,48 @@ const FullscreenImage: React.FC<FullscreenImageProps> = ({ imageSrc, isPurchased
 
     const handleShareClick = async () => {
         if (navigator.share) {
-            const shareData: { title: string; text: string; url?: string } = {
-                title: 'Check out this photo',
-                text: 'Here is a photo from the album.',
-            };
-
-            if (typeof imageSrc === 'string') {
-                if (isBase64(imageSrc)) {
-                    const blob = dataURItoBlob(imageSrc);
-                    const url = URL.createObjectURL(blob);
-                    shareData.url = url;
-                } else {
-                    shareData.url = imageSrc;
-                }
-            } else if (imageSrc && typeof imageSrc === 'object' && 'byteLength' in imageSrc) {
-                const blob = bufferToBlob(imageSrc, 'image/jpeg');
-                const url = URL.createObjectURL(blob);
-                shareData.url = url;
-            }
-
             try {
-                await navigator.share(shareData);
-                console.log('Sharing succeeded');
-                
-                if (shareData.url && (isBase64(imageSrc) || (imageSrc && typeof imageSrc === 'object' && 'byteLength' in imageSrc))) {
-                    URL.revokeObjectURL(shareData.url);
+                let shareData: { title: string; text: string; files?: File[] } = {
+                    title: 'Check out this photo',
+                    text: 'Here is a photo from the album.',
+                };
+    
+                if (typeof imageSrc === 'string') {
+                    // If imageSrc is a URL or base64, we handle it differently
+                    if (isBase64(imageSrc)) {
+                        const blob = dataURItoBlob(imageSrc);
+                        const file = new File([blob], `image_${imageId}.jpeg`, { type: 'image/jpeg' });
+                        shareData.files = [file];
+                    } else {
+                        // Sharing as a URL instead of Blob
+                        const response = await fetch(imageSrc);
+                        const blob = await response.blob();
+                        const file = new File([blob], `image_${imageId}.jpeg`, { type: blob.type });
+                        shareData.files = [file];
+                    }
+                } else if (imageSrc && typeof imageSrc === 'object' && 'byteLength' in imageSrc) {
+                    // If it's an ArrayBuffer, convert and share as a file
+                    const blob = bufferToBlob(imageSrc, 'image/jpeg');
+                    const file = new File([blob], `image_${imageId}.jpeg`, { type: 'image/jpeg' });
+                    shareData.files = [file];
+                }
+    
+                if (shareData.files && shareData.files.length > 0) {
+                    await navigator.share(shareData);
+                    console.log('Sharing succeeded');
+                } else {
+                    console.error('No valid files to share.');
                 }
             } catch (error) {
                 console.error('Sharing failed', error);
             }
         } else {
             console.log('Web Share API is not supported in this browser.');
-            togglePopup();
+            togglePopup(); 
         }
     };
+    
+    
 
     return (
         <FullscreenContainer>
