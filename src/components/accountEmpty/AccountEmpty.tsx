@@ -10,7 +10,6 @@ import {
   PrintImage, 
   Grid,  
 } from './AccounttEmpty.styled';
-
 import group from '../../assets/images/Group.png';
 import print1 from '../../assets/images/1ex.png';
 import print2 from '../../assets/images/2ex.png';
@@ -41,7 +40,7 @@ const AccountEmpty = () => {
   const handleImageClick = (image: string) => {
     setSelectedImage(image);
     setIsFullscreen(true);
-  }
+  };
   
   const handleCloseFullscreen = () => {
     setIsFullscreen(false);

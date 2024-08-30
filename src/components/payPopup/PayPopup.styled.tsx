@@ -27,8 +27,6 @@ export const PayPopupContainer = styled.div.attrs(() => ({
       }
   `;
   
-
-
 export const InnerContainer = styled.div`
     width: 100%;
     display: flex;
@@ -229,7 +227,6 @@ export const ButtonPayPal = styled.button`
     height: 50px;
     cursor: pointer;
     transition: all 0.3s ease-in-out;
-
 
     img {
         width: 110px;

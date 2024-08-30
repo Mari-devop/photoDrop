@@ -74,7 +74,6 @@ export const AlbumContainer = styled.div`
     margin-bottom: 19px;
     overflow-x: auto; 
     white-space: nowrap; 
-    
 `;
 
 export const Album = styled.div`

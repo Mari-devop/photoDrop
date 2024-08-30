@@ -3,12 +3,12 @@ export interface Image {
     binaryString: string;
     isPurchased: boolean;
     date: string;
-}
+};
   
 export interface AlbumData {
     locationName: string;
     images: Image[];
-}
+};
 
 export interface AccountFullDataProps {
     imagesData: {
@@ -19,4 +19,4 @@ export interface AccountFullDataProps {
         date: string;
         }[];
     }[];
-}
+};

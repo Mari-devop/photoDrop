@@ -1,6 +1,5 @@
 import styled from 'styled-components';
 
-
 export const FullScreenContainer = styled.div`
     position: fixed;
     top: 0;
@@ -16,9 +15,9 @@ export const FullScreenContainer = styled.div`
 
 export const EmbeddedCheckoutContainer = styled.div`
     width: 100%;
-    max-height: 90%; /* Adjust this value as needed */
-    overflow-y: auto; /* Enable vertical scrolling */
-    padding: 20px; /* Optional: Add padding around the form */
+    max-height: 90%; 
+    overflow-y: auto; 
+    padding: 20px; 
     box-sizing: border-box;
 `;
 

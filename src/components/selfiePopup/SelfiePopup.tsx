@@ -1,11 +1,6 @@
 import React, { useRef } from 'react';
 import { Container, Subtitle, Button, CloseIcon, InnerContainer, ButtonContainer } from './SelfiePopup.styled';
-
-interface SelfiePopupProps {
-  onClose: () => void;
-  onFileUpload: (file: File) => void;
-  onCameraCapture: () => void;
-}
+import { SelfiePopupProps } from './types';
 
 const SelfiePopup = ({ onClose, onFileUpload, onCameraCapture }: SelfiePopupProps) => {
   const fileInputRef = useRef<HTMLInputElement | null>(null);

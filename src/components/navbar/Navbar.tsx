@@ -105,15 +105,15 @@ const Navbar = () => {
     ? new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) 
     : '';
     
-    const handleUnlockPhotosClick = () => {
-      setShowPayPopup(true);
-      setTimeout(() => {
-        const popupElement = document.getElementById('pay-popup');
-        if (popupElement) {
-          popupElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }
-      }, 0);
-    };
+  const handleUnlockPhotosClick = () => {
+    setShowPayPopup(true);
+    setTimeout(() => {
+      const popupElement = document.getElementById('pay-popup');
+      if (popupElement) {
+        popupElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }, 0);
+  };
     
   const handleClosePayPopup = () => {
     setShowPayPopup(false);

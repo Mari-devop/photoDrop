@@ -1,17 +1,26 @@
 import React, { useEffect, useState } from 'react';
 import { PaymentRequestButtonElement, useStripe, useElements } from '@stripe/react-stripe-js';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import { ApplePayProps } from './types';
 
-const ApplePay = () => {
+const ApplePay: React.FC<ApplePayProps> = ({ imageIds, onClose, amount }) => {
   const stripe = useStripe();
   const elements = useElements();
   const [paymentRequest, setPaymentRequest] = useState<any>(null);
   const navigate = useNavigate();
-  const location = useLocation();
-  const { imageIds = [] } = location.state || {};
 
   useEffect(() => {
+    if(paymentRequest || amount === 0) {
+      return;
+    }
+
     if (!stripe || !elements) {
+      console.error('Stripe or elements are not initialized');
+      return;
+    }
+
+    if (imageIds.length === 0) {
+      console.error('No image IDs for payment processing.');
       return;
     }
 
@@ -20,7 +29,7 @@ const ApplePay = () => {
       currency: 'usd',
       total: {
         label: 'Total',
-        amount: imageIds.length * 100, 
+        amount: amount, 
       },
       requestPayerName: true,
       requestPayerEmail: true,
@@ -28,6 +37,7 @@ const ApplePay = () => {
 
     pr.canMakePayment().then((result) => {
       if (result) {
+        console.log('Apple Pay is available.');
         setPaymentRequest(pr);
       } else {
         console.error('Apple Pay is not available.');
@@ -43,29 +53,34 @@ const ApplePay = () => {
             'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
           },
           body: JSON.stringify({
-            imageIds,
-            paymentMethodType: 'apple-pay',
+            imageIds, 
+            paymentMethod: 'apple-pay',
             currency: 'usd',
+            amount: amount, 
           }),
         });
 
-        const { clientSecret, error: backendError } = await response.json();
+        const data = await response.json();
+        console.log("Received data from server:", data);
 
-        if (backendError) {
-          console.error('Backend error:', backendError);
+        const clientSecret = data.client_secret;
+
+        if (!clientSecret) {
+          console.error('Missing client_secret');
           return;
         }
-
+    
         const { error: stripeError, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
           payment_method: e.paymentMethod.id,
         }, { handleActions: false });
-
+        
         if (stripeError) {
           console.error('Stripe error:', stripeError);
           return;
         }
 
         if (paymentIntent && paymentIntent.status === 'succeeded') {
+          onClose();
           navigate('/success');
         } else {
           console.error('Payment failed or incomplete:', paymentIntent);
@@ -74,10 +89,22 @@ const ApplePay = () => {
         console.error('Payment failed:', error);
       }
     });
-  }, [stripe, elements, navigate, imageIds, paymentRequest]);
+  }, [stripe, elements, imageIds, amount, navigate, onClose, paymentRequest]);
+
+  useEffect(() => {
+    if (paymentRequest && amount > 0) {
+ 
+      paymentRequest.update({
+        total: {
+          label: 'Total',
+          amount: amount,
+        },
+      });
+    }
+  }, [amount, paymentRequest]);
 
   return paymentRequest ? (
-    <div style={{ width: '100%', maxWidth: '460px', margin: '0 auto', padding: '10px',  borderRadius: '100px', overflow: 'hidden' }}>
+    <div className='custom-apple-pay-button'>
       <PaymentRequestButtonElement 
         options={{ 
           paymentRequest,

@@ -3,9 +3,9 @@ export interface AlbumImage {
     binaryString: string;
     isPurchased: boolean;
     date: string;
-}
+};
 
 export interface SharePopupProps {
     selectedImage: AlbumImage | null;
     onClose: () => void;
-}
+};

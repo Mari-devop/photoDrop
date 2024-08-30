@@ -16,7 +16,6 @@ import {
 import FullscreenImage from '../fullScreenImage/FullScreenImage';
 import Footer from '../footer/Footer';
 
-
 const AccountFullData: React.FC<AccountFullDataProps> = ({ imagesData }) => {
   const navigate = useNavigate();
   const [albums, setAlbums] = useState<AlbumData[]>([]);
@@ -65,7 +64,6 @@ const AccountFullData: React.FC<AccountFullDataProps> = ({ imagesData }) => {
 
     try {
       const token = localStorage.getItem('authToken');
-
       const imageResponse = await axios.get(`https://photodrop-dawn-surf-6942.fly.dev/client/image/${currentImageId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -124,12 +122,12 @@ const AccountFullData: React.FC<AccountFullDataProps> = ({ imagesData }) => {
 
   useEffect(() => {
     const timeouts = [
-      setTimeout(() => setAnimationStep(1), 0),    // Navbar
-      setTimeout(() => setAnimationStep(2), 500),  // First Subtitle
-      setTimeout(() => setAnimationStep(3), 1000), // Album 1
-      setTimeout(() => setAnimationStep(4), 1500), // Second Subtitle
-      setTimeout(() => setAnimationStep(5), 2000), // Photos
-      setTimeout(() => setAnimationStep(6), 2500), // Footer
+      setTimeout(() => setAnimationStep(1), 0),    
+      setTimeout(() => setAnimationStep(2), 500),  
+      setTimeout(() => setAnimationStep(3), 1000), 
+      setTimeout(() => setAnimationStep(4), 1500), 
+      setTimeout(() => setAnimationStep(5), 2000), 
+      setTimeout(() => setAnimationStep(6), 2500), 
     ];
 
     return () => {

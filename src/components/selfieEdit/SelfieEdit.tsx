@@ -2,13 +2,7 @@ import React, { useState, useCallback } from 'react';
 import Cropper, { Area } from 'react-easy-crop';
 import { Overlay, SelfieContainer, Title, CloseIcon, InnerContainer, Text, ButtonContainer, ButtonRetake, ButtonSave } from './SelfieEdit.styled';
 import { getCroppedImg } from '../../utils/CropImage';
-
-interface SelfieEditProps {
-  onClose: () => void;
-  tempSelfieSrc: string | null; 
-  onRetake: () => void;
-  onSave: (croppedImage: ArrayBuffer) => void;
-}
+import { SelfieEditProps } from './types';
 
 const SelfieEdit = ({ onClose, tempSelfieSrc, onRetake, onSave }: SelfieEditProps) => {
   const [crop, setCrop] = useState({ x: 0, y: 0 });

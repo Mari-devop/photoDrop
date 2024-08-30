@@ -12,7 +12,6 @@ import downArrow from '../../assets/images/downArrow.png';
 import share from '../../assets/images/share.png';
 import { dataURItoBlob } from '../../utils/ConverFunc';
 import PayPopup from '../payPopup/PayPopup';
-import SharePopup from '../sharePopup/SharePopup';
 
 const FullscreenImage: React.FC<FullscreenImageProps> = ({ imageSrc, isPurchased, imageId, onClose, isMobile, date }) => {
     const [showPayPopup, setShowPayPopup] = useState(false);
@@ -64,7 +63,6 @@ const FullscreenImage: React.FC<FullscreenImageProps> = ({ imageSrc, isPurchased
     const handleShareClick = () => {
         togglePopup();
     };
-
 
     return (
       <FullscreenContainer>

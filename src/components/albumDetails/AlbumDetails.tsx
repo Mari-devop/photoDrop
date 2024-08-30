@@ -101,7 +101,6 @@ const AlbumDetails: React.FC = () => {
 
   useEffect(() => {
     const intervalId = setInterval(loadNextPhoto, 1000); 
-
     return () => clearInterval(intervalId);
   }, [locationName]);
 
