@@ -36,6 +36,18 @@ const Account: React.FC = () => {
     fetchImagesData();
   }, []);
 
+  useEffect(() => {
+    if (loading) {
+      document.body.style.overflow = 'hidden'; 
+    } else {
+      document.body.style.overflow = ''; 
+    }
+
+    return () => {
+      document.body.style.overflow = ''; 
+    };
+  }, [loading]);
+
   if (loading) {
     return (
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>

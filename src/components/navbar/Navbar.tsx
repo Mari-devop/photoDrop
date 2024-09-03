@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useLocation, Link } from 'react-router-dom';
 import axios from 'axios';
 import logo from '../../assets/images/logo.png';
+import selfiePlaceholder from '../../assets/images/Social.png';
 import {
   NavbarContainer,
   Arrow,
@@ -136,12 +137,14 @@ const Navbar = () => {
         </ArrowContainer>
       )}
       {!isAlbumDetailsPage && (
-        <img src={logo} alt="logo" />
+         <Link to="/account">
+          <img src={logo} alt="logo" />
+       </Link>
       )}
       {location.pathname === '/account' && selfieSrc && (
         <SelfieContainer>
           <Link to="/accountsettings">
-            <SelfieImage src={selfieSrc} alt="selfie" />
+            <SelfieImage src={selfieSrc || selfiePlaceholder} alt="selfie" />
           </Link>
         </SelfieContainer>
       )}
@@ -156,8 +159,8 @@ const Navbar = () => {
             <Wrapper>
               <Title>{albumId}</Title> 
               <TextContainer>
-                <p>{formattedDate}</p>
                 <span>{photoCount} photos</span>
+                <p>{formattedDate}</p>
               </TextContainer>
             </Wrapper>
           </div>

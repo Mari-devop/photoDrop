@@ -3,14 +3,15 @@ import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { arrayBufferToBase64 } from '../../utils/ConverFunc';
 import { Image } from './types';
-import { Container, PhotoGrid, Button } from './AlbumDetails.styled';
+import { Container, PhotoGrid, Button, ImageWrapper, SpinnerWrapper } from './AlbumDetails.styled';
 import Footer from '../footer/Footer';
 import FullscreenImage from '../fullScreenImage/FullScreenImage';
 import PayPopup from '../payPopup/PayPopup';
+import { ThreeCircles } from 'react-loader-spinner';
 
 const AlbumDetails: React.FC = () => {
   const { albumId: locationName } = useParams<{ albumId: string }>(); 
-  const [images, setImages] = useState<Image[]>([]);
+  const [images, setImages] = useState<Array<Image & { isLoading: boolean }>>([]);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [selectedImage, setSelectedImage] = useState<Image | null>(null);
   const [isMobile, setIsMobile] = useState<boolean>(window.innerWidth < 500);
@@ -18,7 +19,8 @@ const AlbumDetails: React.FC = () => {
   const navigate = useNavigate();
   const loadingState = useRef({
     currentPhotoIndex: 0,
-    isLoading: false, 
+    totalPhotos: 0,
+    isLoading: false,
   });
 
   useEffect(() => {
@@ -35,12 +37,55 @@ const AlbumDetails: React.FC = () => {
     return () => window.removeEventListener('resize', handleResize);
   }, [navigate]);
 
-  const loadNextPhoto = async () => {
-    const { currentPhotoIndex, isLoading } = loadingState.current;
-    if (isLoading || !locationName) return;
+  const loadInitialContainers = (imageCount: number) => {
+    const initialImages = Array.from({ length: imageCount }, (_, index) => ({
+      id: index,
+      binaryString: '',
+      isPurchased: false,
+      date: '',
+      isLoading: true,
+    }));
 
-    loadingState.current.isLoading = true;
+    setImages(initialImages);
+    loadingState.current.totalPhotos = imageCount;
+  };
 
+  const loadPhoto = async (photoIndex: number, selectedAlbum: any) => {
+    try {
+      const token = localStorage.getItem('authToken');
+      const currentImageId = selectedAlbum.images[photoIndex].id;
+
+      const imageResponse = await axios.get(`https://photodrop-dawn-surf-6942.fly.dev/client/image/${currentImageId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        responseType: 'json',
+      });
+
+      if (imageResponse.status === 200 && imageResponse.data) {
+        const byteArray = new Uint8Array(imageResponse.data.imageData.data);
+        const binaryString = arrayBufferToBase64(byteArray.buffer);
+        const imageSrc = `data:image/jpeg;base64,${binaryString}`;
+
+        setImages(prevImages =>
+          prevImages.map((img, idx) =>
+            idx === photoIndex ? { ...img, binaryString: imageSrc, isLoading: false } : img
+          )
+        );
+
+        loadingState.current.currentPhotoIndex++;
+
+        if (loadingState.current.currentPhotoIndex < selectedAlbum.images.length) {
+          loadPhoto(loadingState.current.currentPhotoIndex, selectedAlbum);
+        }
+      }
+    } catch (error) {
+      console.error('Error loading image:', error);
+    }
+  };
+
+  const loadPhotos = async () => {
     try {
       const token = localStorage.getItem('authToken');
       const albumResponse = await axios.get('https://photodrop-dawn-surf-6942.fly.dev/client/images', {
@@ -53,55 +98,20 @@ const AlbumDetails: React.FC = () => {
       if (albumResponse.status === 200 && Array.isArray(albumResponse.data)) {
         const selectedAlbum = albumResponse.data.find((album: any) => album.location === locationName);
 
-        if (selectedAlbum && selectedAlbum.images[currentPhotoIndex]) {
-          const currentImageId = selectedAlbum.images[currentPhotoIndex].id;
+        if (selectedAlbum) {
+          loadInitialContainers(selectedAlbum.images.length);
+          navigate(`/albumDetails/${locationName}?photos=${selectedAlbum.images.length}&date=${selectedAlbum.images[0].date}`, { replace: true });
 
-          const imageResponse = await axios.get(`https://photodrop-dawn-surf-6942.fly.dev/client/image/${currentImageId}`, {
-            headers: {
-              Authorization: `Bearer ${token}`,
-              'Content-Type': 'application/json',
-            },
-            responseType: 'json',
-          });
-
-          if (imageResponse.status === 200 && imageResponse.data) {
-            const byteArray = new Uint8Array(imageResponse.data.imageData.data);
-            const binaryString = arrayBufferToBase64(byteArray.buffer);
-            const imageSrc = `data:image/jpeg;base64,${binaryString}`;
-
-            const newImage: Image = {
-              id: currentImageId,
-              binaryString: imageSrc,
-              isPurchased: selectedAlbum.images[currentPhotoIndex].isPurchased,
-              date: selectedAlbum.images[currentPhotoIndex].date, 
-            };
-
-            setImages(prevImages => {
-              const existingImage = prevImages.find(img => img.id === newImage.id);
-              if (!existingImage) {
-                return [...prevImages, newImage];
-              }
-              return prevImages;
-            });
-
-            if (currentPhotoIndex === 0) {
-              navigate(`/albumDetails/${locationName}?photos=${selectedAlbum.images.length}&date=${newImage.date}`, { replace: true });
-            }
-            
-            loadingState.current.currentPhotoIndex++;
-          }
+          loadPhoto(loadingState.current.currentPhotoIndex, selectedAlbum);
         }
       }
     } catch (error) {
-      console.error('Error loading image:', error);
+      console.error('Error loading album images:', error);
     }
-
-    loadingState.current.isLoading = false;
   };
 
   useEffect(() => {
-    const intervalId = setInterval(loadNextPhoto, 1000); 
-    return () => clearInterval(intervalId);
+    loadPhotos();
   }, [locationName]);
 
   const handleImageClick = (image: Image) => {
@@ -122,26 +132,29 @@ const AlbumDetails: React.FC = () => {
 
   const handlePayPopupClose = () => {
     setShowPayPopup(false);
-    if (images.some(image => image.isPurchased)) {
-      handlePurchaseCompletion();
-    }
   };
-
-  const handlePurchaseCompletion = () => {
-    navigate('/thankyou', {
-      state: {
-        albumName: locationName, 
-        purchasedPhotos: images.filter(image => image.isPurchased) 
-      }
-    });
-  };
-  
 
   return (
     <Container>
       <PhotoGrid>
         {images.map(image => (
-          <img src={image.binaryString} alt="Pho" key={image.id} onClick={() => handleImageClick(image)} />
+          <ImageWrapper key={image.id}>
+            {image.isLoading ? (
+              <SpinnerWrapper>
+                <ThreeCircles
+                  visible={true}
+                  height="100"
+                  width="100"
+                  color="#3300CC"
+                  ariaLabel="three-circles-loading"
+                  wrapperStyle={{}}
+                  wrapperClass=""
+                />
+              </SpinnerWrapper>
+            ) : (
+              <img src={image.binaryString} alt="Photo" onClick={() => handleImageClick(image)} />
+            )}
+          </ImageWrapper>
         ))}
       </PhotoGrid>
       {!areAllImagesPurchased && (
@@ -166,7 +179,6 @@ const AlbumDetails: React.FC = () => {
           showAllPhotosOnly={true}
         />
       )}
-
     </Container>
   );
 };

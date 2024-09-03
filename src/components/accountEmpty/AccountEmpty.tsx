@@ -13,7 +13,7 @@ import {
 import group from '../../assets/images/Group.png';
 import print1 from '../../assets/images/1ex.png';
 import print2 from '../../assets/images/2ex.png';
-import print3 from '../../assets/images/2ex.png';
+import print3 from '../../assets/images/Tokyo-Station.jpg';
 import Footer from '../../components/footer/Footer';
 import FullscreenImage from '../fullScreenImage/FullScreenImage'; 
 

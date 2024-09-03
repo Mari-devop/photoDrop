@@ -8,6 +8,9 @@ export const FooterContainer = styled.footer`
     flex-direction: row;
     align-items: center;
     justify-content: center; 
+    margin-top: auto;
+    position: relative;
+    bottom: 0;
 `;
 
 export const Grid = styled.div`

@@ -2,30 +2,33 @@ import styled from "styled-components";
 
 export const PayPopupContainer = styled.div.attrs(() => ({
     id: "pay-popup", 
-  }))`
-      position: fixed; 
-      top: 50%;
-      left: 50%;
-      width: 480px;
-      transform: translate(-50%, -50%);
-      background-color: var(--white-color);
-      border-radius: 25px;
-      box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.1);
-      z-index: 1000;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 14px; 
-      box-sizing: border-box;
+}))`
+    position: fixed; 
+    top: 50%;
+    left: 50%;
+    width: 480px;
+    transform: translate(-50%, -50%);
+    background-color: var(--white-color);
+    border-radius: 25px;
+    box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.1);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 14px; 
+    box-sizing: border-box;
   
-      @media (max-width: 500px) {
-          width: 100%;
-          height: auto;
-          border-bottom-left-radius: 0;
-          border-bottom-right-radius: 0;
-          transform: translate(-50%, -50%);
-      }
-  `;
+    @media (max-width: 500px) {
+        width: 100%;
+        height: auto;
+        top: auto;
+        bottom: 0;
+        left: 0;
+        transform: none;
+        border-radius: 25px 25px 0 0;
+    }
+`;
+
   
 export const InnerContainer = styled.div`
     width: 100%;
@@ -115,14 +118,15 @@ export const Input = styled.input`
   width: 20px;
   height: 20px;
   border-radius: 50%;
-  border: 2px solid #aaa;
+  border: 2px solid #aaa;  
   position: relative;
   outline: none;
   cursor: pointer;
+  background-color: white;  
 
   &:checked {
-    border-color: #4a3aff;
-    background-color: #4a3aff;
+    border-color: #4a3aff;  
+    background-color: white;  
   }
 
   &:checked::before {
@@ -131,7 +135,7 @@ export const Input = styled.input`
     width: 10px;
     height: 10px;
     border-radius: 50%;
-    background: white;
+    background: #4a3aff; 
     position: absolute;
     top: 50%;
     left: 50%;
@@ -143,6 +147,7 @@ export const Input = styled.input`
     color: #4a3aff;
   }
 `;
+
 
 export const Label = styled.label`
   display: flex;

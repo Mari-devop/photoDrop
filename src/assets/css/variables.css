@@ -7,7 +7,7 @@
     --input-color: #F4F4F4;
     --popup-color: #F5F4F2;
     --popup-divider-color: #AEAEAE;
-    --button-color: #3300CC;
+    --button-color: #3300cc;
     --button-hover-color: #9e85e7;
 }
 
@@ -32,3 +32,12 @@
     overflow: hidden; 
 }
 
+body {
+    -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+    -khtml-user-select: none; /* Konqueror HTML */
+    -moz-user-select: none; /* Old versions of Firefox */
+    -ms-user-select: none; /* Internet Explorer/Edge */
+    user-select: none; /* Non-prefixed version, currently supported by Chrome, Edge, Opera and Firefox */
+}
+  

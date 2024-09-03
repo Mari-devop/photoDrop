@@ -10,40 +10,54 @@ export const Container = styled.div`
 export const FirstRow = styled.div`
     display: flex;
     flex-direction: column;
-    padding-left: 120px;
-    padding-right: 120px;
+    padding-left: 100px;
+    padding-right: 100px;
     padding-top: 40px;
+
+    @media (max-width: 1920px) {
+        padding-left: 60px;
+        padding-right: 60px;
+    }
+
+    @media (max-width: 1440px) {
+        padding-left: 40px;
+        padding-right: 40px;
+    }
+
+    @media (max-width: 1200px) {
+        padding-left: 20px;
+        padding-right: 20px;
+    }
 
     @media (max-width: 1000px) {
         padding: 15px;
+    }
+
+    @media (max-width: 375px) {
+        padding: 0px;
     }
 `;
 
 export const SecondRow = styled.div`
     display: flex;
     flex-direction: column;
-     padding-left: 120px;
-    padding-right: 120px;
+    padding-left: 100px;
+    padding-right: 100px;
     padding-top: 100px;
 
-    @media (max-width: 1839px) {
-        padding: 110px;
+    @media (max-width: 1920px) {
+        padding-left: 60px;
+        padding-right: 60px;
     }
 
-    @media (max-width: 1819px) {
-        padding: 100px;
-    }
-    
-    @media (max-width: 1799px) {
-        padding: 50px;
+    @media (max-width: 1440px) {
+        padding-left: 40px;
+        padding-right: 40px;
     }
 
-    @media (max-width: 1699px) {
-        padding: 40px;
-    }
-
-    @media (max-width: 1666px) {
-        padding: 120px;
+    @media (max-width: 1200px) {
+        padding-left: 20px;
+        padding-right: 20px;
     }
 
     @media (max-width: 1000px) {
@@ -80,6 +94,8 @@ export const Album = styled.div`
     display: flex;
     flex-shrink: 0;
     position: relative;
+    outline: none;
+    
     img {
         width: 200px;
         height: 254px;
@@ -87,55 +103,50 @@ export const Album = styled.div`
         object-fit: cover;
 
         @media (max-width: 537px) {
-             width: 110px;
+            width: 110px;
             height: 140px;
         }
+    }
+
+    &:focus {
+        outline: none;
+        box-shadow: 0 0 0 3px #3300CC8A; 
     }
 `;
 
 export const PhotoContainer = styled.div`
     display: grid;
-    grid-template-columns: repeat(auto-fill, 400px);
+    grid-template-columns: repeat(auto-fill, minmax(400px, 1fr)); 
     grid-template-rows: auto;
-   
-    img {
-        width: 400px;
-        height: 400px;
-        object-fit: cover;
+    gap: 0;
 
-        @media (max-width: 1439px) {
-            width: 350px;
-            height: 350px;
-        }
-        @media (max-width: 1283px) {
-            width: 250px;
-            height: 250px;
-        }
-        @media (max-width: 900px) {
-            width: 250px;
-            height: 250px;
-        }
-
-        @media (max-width: 537px){
-            width: 125px;
-            height: 125px;
-        }
+    @media (max-width: 1440px) {
+        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
     }
 
-    @media (max-width: 1439px) {
-         grid-template-columns: repeat(auto-fill, 350px);
-    }
-
-     @media (max-width: 1283px) {
-         grid-template-columns: repeat(auto-fill, 250px);
+    @media (max-width: 1200px) {
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     }
 
     @media (max-width: 900px) {
-         grid-template-columns: repeat(auto-fill, 250px);
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
     }
 
-     @media (max-width: 537px) {
-         grid-template-columns: repeat(auto-fill, 125px);
+    @media (max-width: 537px) {
+        grid-template-columns: repeat(auto-fill, minmax(125px, 1fr));
+    }
+
+    img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        cursor: pointer;
+        aspect-ratio: 1 / 1; 
+
+        &:focus {
+            outline: none; 
+            box-shadow: 0 0 0 3px #3300CC8A; 
+        }
     }
 `;
 
@@ -193,4 +204,18 @@ export const UnlockButton = styled.button`
     }
 `;
 
+export const ImageWrapper = styled.div`
+    width: 100%;
+    height: 100%;
+    position: relative;
+    border: 0.3px solid var(--button-hover-color);  
+    background-color: rgba(51, 0, 204, 0.05);
+    aspect-ratio: 1 / 1;
+`;
 
+export const SpinnerWrapper = styled.div`
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+`;

@@ -43,6 +43,21 @@ const Code = () => {
     }
   };
 
+  const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
+    e.preventDefault();
+    const pastedData = e.clipboardData.getData("text");
+    if (pastedData.length === otp.length) {
+      const newOtp = pastedData.split("");
+      setOtp(newOtp);
+      newOtp.forEach((value, index) => {
+        if (inputRefs.current[index]) {
+          inputRefs.current[index]!.value = value;
+        }
+      });
+      inputRefs.current[otp.length - 1]?.focus();
+    }
+  };
+
   const verifyOtp = async () => {
     setLoading(true);
     try {
@@ -96,10 +111,16 @@ const Code = () => {
     } finally {
       setResendLoading(false);
     }
-  }
+  };
+
+  const handleKeyEnter = (event: React.KeyboardEvent) => {
+    if (event.key === 'Enter') {
+      verifyOtp();
+    }
+  };
 
   return (
-    <MainContainer>
+    <MainContainer onKeyDown={handleKeyEnter}>
       <Title>What’s the code?</Title>
       <div style={{ display: 'flex', flexDirection: 'column' }}>
         <Label>
@@ -114,6 +135,7 @@ const Code = () => {
               value={data}
               onChange={(e) => handleChange(e.target, index)}
               onKeyDown={(e) => handleKeyDown(e, index)}
+              onPaste={handlePaste}
               ref={(el) => (inputRefs.current[index] = el)}
             />
           ))}

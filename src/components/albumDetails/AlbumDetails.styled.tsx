@@ -5,7 +5,7 @@ export const Container = styled.div`
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    min-height: calc(100vh - 60px); 
+    min-height: 100vh;
     position: relative;
     overflow: hidden;
     width: 100%;
@@ -51,4 +51,18 @@ export const Button = styled.button`
     margin: 100px auto;
 `;
 
+export const SpinnerWrapper = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+`;
+
+export const ImageWrapper = styled.div`
+  width: 400px;
+  height: 400px;
+  position: relative;
+  border: 0.3px solid var(--button-hover-color);  
+  background-color: rgba(51, 0, 204, 0.05);
+`;
 

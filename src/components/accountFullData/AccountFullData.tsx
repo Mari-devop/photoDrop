@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
+import FocusTrap from 'focus-trap-react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { arrayBufferToBase64 } from '../../utils/ConverFunc';
@@ -11,10 +12,13 @@ import {
   AlbumContainer,
   FirstRow,
   SecondRow,
-  Text
+  Text,
+  ImageWrapper,
+  SpinnerWrapper,
 } from './AccountFullData.styled';
 import FullscreenImage from '../fullScreenImage/FullScreenImage';
 import Footer from '../footer/Footer';
+import { ThreeCircles } from 'react-loader-spinner'; 
 
 const AccountFullData: React.FC<AccountFullDataProps> = ({ imagesData }) => {
   const navigate = useNavigate();
@@ -23,11 +27,16 @@ const AccountFullData: React.FC<AccountFullDataProps> = ({ imagesData }) => {
   const [selectedImage, setSelectedImage] = useState<Image | null>(null);
   const [isMobile, setIsMobile] = useState<boolean>(window.innerWidth < 500);
   const [animationStep, setAnimationStep] = useState(0);
+  const [loadingImages, setLoadingImages] = useState<{ [key: string]: boolean }>({});
   const loadingState = useRef({
     currentAlbumIndex: 0,
     currentPhotoIndex: 0,
     isLoading: false, 
   });
+  const [focusEnabled, setFocusEnabled] = useState(false);
+
+  const albumRefs = useRef<HTMLAnchorElement[]>([]);
+  const photoRefs = useRef<HTMLImageElement[]>([]);
 
   useEffect(() => {
     const token = localStorage.getItem('authToken');
@@ -62,6 +71,8 @@ const AccountFullData: React.FC<AccountFullDataProps> = ({ imagesData }) => {
     const album = imagesData[currentAlbumIndex];
     const currentImageId = album.images[currentPhotoIndex].id;
 
+    setLoadingImages(prev => ({ ...prev, [currentImageId]: true }));
+
     try {
       const token = localStorage.getItem('authToken');
       const imageResponse = await axios.get(`https://photodrop-dawn-surf-6942.fly.dev/client/image/${currentImageId}`, {
@@ -94,12 +105,16 @@ const AccountFullData: React.FC<AccountFullDataProps> = ({ imagesData }) => {
             }
           } else {
             newAlbums.push({
-              locationName: album.location,
+              locationName: album.location, 
               images: [newImage],
             });
           }
           return newAlbums;
         });
+
+        setTimeout(() => {
+          setLoadingImages(prev => ({ ...prev, [currentImageId]: false }));
+        }, 500);
 
         if (currentPhotoIndex < album.images.length - 1) {
           loadingState.current.currentPhotoIndex++;
@@ -135,56 +150,92 @@ const AccountFullData: React.FC<AccountFullDataProps> = ({ imagesData }) => {
     };
   }, []);
 
-  return (
-    <Container>
-      <FirstRow className={`fade-in ${animationStep >= 2 ? 'fade-in-visible' : ''}`}>
-        <Subtitle>Albums</Subtitle>
-        <AlbumContainer>
-          {albums.map((album, index) => (
-            <Link to={`/albumDetails/${encodeURIComponent(album.locationName)}`} key={index}>
-              <Album className={`fade-in ${animationStep >= 3 ? 'fade-in-visible' : ''}`}>
-                {album.images[0] && (
-                  <>
-                    <img src={album.images[0].binaryString} alt={album.locationName} onClick={() => handleImageClick(album.images[0])} />
-                    <Text>
-                      {album.locationName}
-                    </Text>
-                  </>
-                )}
-              </Album>
-            </Link>
-          ))}
-        </AlbumContainer>
-      </FirstRow>
-      <SecondRow className={`fade-in ${animationStep >= 4 ? 'fade-in-visible' : ''}`}>
-        <Subtitle>All photos</Subtitle>
-        <PhotoContainer>
-          {albums.flatMap(album => album.images).map(image => (
-            <img 
-              className={`fade-in ${animationStep >= 5 ? 'fade-in-visible' : ''}`}
-              src={image.binaryString} 
-              alt={`Im ${image.id}`}
-              key={image.id} 
-              onClick={() => handleImageClick(image)}
-            />
-          ))}
-        </PhotoContainer>
-      </SecondRow>
-      <div className={`fade-in ${animationStep >= 6 ? 'fade-in-visible' : ''}`}>
-       <Footer />
-      </div>
+  useEffect(() => {
+    if (focusEnabled) {
+      if (albumRefs.current.length > 0) {
+        albumRefs.current[0].focus();
+      }
+    }
+  }, [focusEnabled]);
 
-      {isFullscreen && selectedImage && (
-        <FullscreenImage 
-          imageSrc={selectedImage.binaryString} 
-          isPurchased={selectedImage.isPurchased}
-          imageId={selectedImage.id.toString()}  
-          onClose={handleCloseFullscreen}
-          isMobile={isMobile}
-          date={selectedImage.date}  
-        />
-      )}
-    </Container>
+  const handleKeyDown = (event: KeyboardEvent) => {
+    if (event.key === 'Tab') {
+      setFocusEnabled(true);
+    }
+  };
+
+  return (
+    <FocusTrap active={focusEnabled}>
+      <Container>
+        <FirstRow className={`fade-in ${animationStep >= 2 ? 'fade-in-visible' : ''}`}>
+          <Subtitle>Albums</Subtitle>
+          <AlbumContainer>
+            {albums.map((album, index) => (
+              <Link 
+                to={`/albumDetails/${encodeURIComponent(album.locationName)}`} 
+                key={index}
+                ref={(el) => (albumRefs.current[index] = el!)}
+                tabIndex={index + 1}
+              >
+                <Album className={`fade-in ${animationStep >= 3 ? 'fade-in-visible' : ''}`}>
+                  {album.images[0] && (
+                    <>
+                      <img src={album.images[0].binaryString} alt={album.locationName} onClick={() => handleImageClick(album.images[0])} />
+                      <Text>{album.locationName}</Text>
+                    </>
+                  )}
+                </Album>
+              </Link>
+            ))}
+          </AlbumContainer>
+        </FirstRow>
+        <SecondRow className={`fade-in ${animationStep >= 4 ? 'fade-in-visible' : ''}`}>
+          <Subtitle>All photos</Subtitle>
+          <PhotoContainer>
+            {albums.flatMap(album => album.images).map((image, idx) => (
+              <ImageWrapper key={image.id}>
+                {loadingImages[image.id] ? (
+                  <SpinnerWrapper>
+                    <ThreeCircles
+                      visible={true}
+                      height="100"
+                      width="100"
+                      color="#3300CC"
+                      ariaLabel="three-circles-loading"
+                      wrapperStyle={{}}
+                      wrapperClass=""
+                    />
+                  </SpinnerWrapper>
+                ) : (
+                  <img 
+                    className={`fade-in ${animationStep >= 5 ? 'fade-in-visible' : ''}`}
+                    src={image.binaryString} 
+                    alt={`Im ${image.id}`}
+                    ref={(el) => (photoRefs.current[idx] = el!)}
+                    tabIndex={albums.length + idx + 1}
+                    onClick={() => handleImageClick(image)}
+                  />
+                )}
+              </ImageWrapper>
+            ))}
+          </PhotoContainer>
+        </SecondRow>
+        <div className={`fade-in ${animationStep >= 6 ? 'fade-in-visible' : ''}`}>
+          <Footer />
+        </div>
+
+        {isFullscreen && selectedImage && (
+          <FullscreenImage 
+            imageSrc={selectedImage.binaryString} 
+            isPurchased={selectedImage.isPurchased}
+            imageId={selectedImage.id.toString()}  
+            onClose={handleCloseFullscreen}
+            isMobile={isMobile}
+            date={selectedImage.date}  
+          />
+        )}
+      </Container>
+    </FocusTrap>
   );
 };
 

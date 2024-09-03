@@ -9,10 +9,9 @@ export const MainContainer = styled.div`
     width: 100%; 
     max-width: 420px; 
     padding: 0 20px;
-   
+    user-select: none;
     max-height: calc(100vh - 60px); 
    
-
     @media (max-width: 500px) {
         width: 345px;
         height: 100%;
@@ -117,10 +116,15 @@ export const CloseButton = styled.button`
   border: none;
   color: white;
   width: 27px;
-  height: 27px;
+  height: 37px;
   font-size: 36px;
   cursor: pointer;
   padding: 0;
+
+    &:focus {
+        outline: none; 
+        box-shadow: 0 0 0 3px #3300CC8A; 
+    }
 `;
 
 export const FullscreenContainer = styled.div`
@@ -153,6 +157,11 @@ export const DownloadButton = styled.a`
     gap: 5px;
     width: 58px;
     height: 37px;
+
+    &:focus {
+        outline: none; 
+        box-shadow: 0 0 0 3px #3300CC8A; 
+    }
 `;
 
 export const SeeInFrameButton = styled.button`
@@ -197,4 +206,19 @@ export const ShareButton = styled.button`
     gap: 5px;
     width: 32px;
     height: 37px;
+`;
+
+export const ErrorPopup = styled.div`
+    position: absolute;
+    top: 0%;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #ff4d4f;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-family: 'Futura PT';
+    font-size: 14px;
+    text-align: center;
+    z-index: 1000;
 `;

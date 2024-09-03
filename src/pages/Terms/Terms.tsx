@@ -1,7 +1,11 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { PolicyContainer, Title, Text, Subtitle } from '../Policy/Policy.styled';
 
 const Terms = () => {
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   return (
     <PolicyContainer>
       <Title>Terms of Use & Privacy Policy</Title>

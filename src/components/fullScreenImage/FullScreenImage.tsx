@@ -1,4 +1,5 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
+import FocusTrap from 'focus-trap-react';
 import { FullscreenImageProps } from './types';
 import { 
   CloseButton, 
@@ -18,6 +19,25 @@ const FullscreenImage: React.FC<FullscreenImageProps> = ({ imageSrc, isPurchased
     const [showPayPopup, setShowPayPopup] = useState(false);
     const [showSharePopup, setShowSharePopup] = useState(false); 
     const imgRef = useRef<HTMLImageElement>(null);
+    const [focusEnabled, setFocusEnabled] = useState(false);
+
+    useEffect(() => {
+        const handleKeyDown = (event: KeyboardEvent) => {
+            if (event.key === 'Escape') {
+                onClose();
+            }
+
+            if (event.key === 'Tab') {
+                setFocusEnabled(true); 
+            }
+        };
+
+        document.addEventListener('keydown', handleKeyDown);
+
+        return () => {
+            document.removeEventListener('keydown', handleKeyDown);
+        };
+    }, [onClose]);
 
     const togglePayPopup = () => {
       setShowPayPopup(!showPayPopup);
@@ -74,52 +94,54 @@ const FullscreenImage: React.FC<FullscreenImageProps> = ({ imageSrc, isPurchased
     };
 
     return (
-        <FullscreenContainer>
-            <CloseButton onClick={onClose}>×</CloseButton>
-            <img 
-                ref={imgRef}
-                src={typeof imageSrc === 'string' 
-                    ? imageSrc 
-                    : URL.createObjectURL(bufferToBlob(imageSrc as ArrayBuffer, 'image/jpeg'))} 
-                alt="fullscreen" 
-                style={{ width: '100%', height: '100%', objectFit: 'contain' }} 
-            />
-            <div style={{ position: 'absolute', bottom: '30px', right: '40px', display: 'flex', gap: '29px', alignItems: 'center' }}>
-                {isPurchased ? (
-                    <>
-                        <DownloadButton onClick={handleDownloadClick}>
-                            <img src={downArrow} alt="svg" style={{width: '24px', height: "21px" }} />Download
-                        </DownloadButton>
-                        {isMobile && (
-                            <ShareButton onClick={toggleSharePopup}>  
-                                <img src={share} alt="svg" />
-                                Share
-                            </ShareButton>
-                        )}
-                        <SeeInFrameButton>See in Frame</SeeInFrameButton>
-                    </>
-                ) : (
-                    <UnlockButton onClick={togglePayPopup}>Unlock photos</UnlockButton>
+        <FocusTrap active={focusEnabled}>
+            <FullscreenContainer>
+                <CloseButton onClick={onClose} tabIndex={focusEnabled ? 2 : -1}>×</CloseButton>
+                <img 
+                    ref={imgRef}
+                    src={typeof imageSrc === 'string' 
+                        ? imageSrc 
+                        : URL.createObjectURL(bufferToBlob(imageSrc as ArrayBuffer, 'image/jpeg'))} 
+                    alt="fullscreen" 
+                    style={{ width: '100%', height: '100%', objectFit: 'contain' }} 
+                />
+                <div style={{ position: 'absolute', bottom: '30px', right: '40px', display: 'flex', gap: '29px', alignItems: 'center' }}>
+                    {isPurchased ? (
+                        <>
+                            <DownloadButton onClick={handleDownloadClick} tabIndex={1}>
+                                <img src={downArrow} alt="svg" style={{width: '24px', height: "21px" }} />Download
+                            </DownloadButton>
+                            {isMobile && (
+                                <ShareButton onClick={toggleSharePopup} tabIndex={3}>  
+                                    <img src={share} alt="svg" />
+                                    Share
+                                </ShareButton>
+                            )}
+                            <SeeInFrameButton tabIndex={-1}>See in Frame</SeeInFrameButton>
+                        </>
+                    ) : (
+                        <UnlockButton onClick={togglePayPopup} tabIndex={5}>Unlock photo</UnlockButton>
+                    )}
+                </div>
+                {showPayPopup && (
+                    <PayPopup 
+                        onClose={togglePayPopup} 
+                        imageIds={[Number(imageId)]}   
+                    />
                 )}
-            </div>
-            {showPayPopup && (
-                <PayPopup 
-                    onClose={togglePayPopup} 
-                    imageIds={[Number(imageId)]}     
+            {showSharePopup && (
+                <SharePopup 
+                    selectedImage={{ 
+                        binaryString: imageSrc, 
+                        id: Number(imageId), 
+                        isPurchased,           
+                        date                   
+                    }}  
+                    onClose={toggleSharePopup}  
                 />
             )}
-          {showSharePopup && (
-            <SharePopup 
-                selectedImage={{ 
-                    binaryString: imageSrc, 
-                    id: Number(imageId), 
-                    isPurchased,           
-                    date                   
-                }}  
-                onClose={toggleSharePopup}  
-            />
-        )}
-        </FullscreenContainer>
+            </FullscreenContainer>
+        </FocusTrap>
     );
 };
 
