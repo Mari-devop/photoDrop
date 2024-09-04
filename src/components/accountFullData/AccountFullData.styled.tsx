@@ -107,11 +107,6 @@ export const Album = styled.div`
             height: 140px;
         }
     }
-
-    &:focus {
-        outline: none;
-        box-shadow: 0 0 0 3px #3300CC8A; 
-    }
 `;
 
 export const PhotoContainer = styled.div`
@@ -142,11 +137,6 @@ export const PhotoContainer = styled.div`
         object-fit: cover;
         cursor: pointer;
         aspect-ratio: 1 / 1; 
-
-        &:focus {
-            outline: none; 
-            box-shadow: 0 0 0 3px #3300CC8A; 
-        }
     }
 `;
 
@@ -218,4 +208,20 @@ export const SpinnerWrapper = styled.div`
     justify-content: center;
     align-items: center;
     height: 100%;
+`;
+
+export const LoadMoreButton = styled.button`
+  display: block;
+  margin: 20px auto; 
+  padding: 10px 20px;
+  background-color: #3300cc;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  
+  &:hover {
+    background-color: #220099;
+  }
 `;

@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
+import FocusTrap from 'focus-trap-react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { arrayBufferToBase64 } from '../../utils/ConverFunc';
@@ -8,6 +9,7 @@ import Footer from '../footer/Footer';
 import FullscreenImage from '../fullScreenImage/FullScreenImage';
 import PayPopup from '../payPopup/PayPopup';
 import { ThreeCircles } from 'react-loader-spinner';
+import { LoadMoreButton } from '../accountFullData/AccountFullData.styled';
 
 const AlbumDetails: React.FC = () => {
   const { albumId: locationName } = useParams<{ albumId: string }>(); 
@@ -17,6 +19,9 @@ const AlbumDetails: React.FC = () => {
   const [isMobile, setIsMobile] = useState<boolean>(window.innerWidth < 500);
   const [showPayPopup, setShowPayPopup] = useState(false);
   const navigate = useNavigate();
+  const [focusEnabled, setFocusEnabled] = useState(false);
+  const [displayedImages, setDisplayedImages] = useState(3);
+
   const loadingState = useRef({
     currentPhotoIndex: 0,
     totalPhotos: 0,
@@ -36,6 +41,20 @@ const AlbumDetails: React.FC = () => {
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, [navigate]);
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Tab') {
+        setFocusEnabled(true);
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, []);
 
   const loadInitialContainers = (imageCount: number) => {
     const initialImages = Array.from({ length: imageCount }, (_, index) => ({
@@ -134,52 +153,74 @@ const AlbumDetails: React.FC = () => {
     setShowPayPopup(false);
   };
 
+  const loadMorePhotos = () => {
+    setDisplayedImages(images.length); 
+  };
+  
   return (
-    <Container>
-      <PhotoGrid>
-        {images.map(image => (
-          <ImageWrapper key={image.id}>
-            {image.isLoading ? (
-              <SpinnerWrapper>
-                <ThreeCircles
-                  visible={true}
-                  height="100"
-                  width="100"
-                  color="#3300CC"
-                  ariaLabel="three-circles-loading"
-                  wrapperStyle={{}}
-                  wrapperClass=""
-                />
-              </SpinnerWrapper>
-            ) : (
-              <img src={image.binaryString} alt="Photo" onClick={() => handleImageClick(image)} />
-            )}
-          </ImageWrapper>
-        ))}
-      </PhotoGrid>
-      {!areAllImagesPurchased && (
-        <Button onClick={handleUnlockPhotosClick}>
-          Unlock your photos
-        </Button> )}
-      <Footer />
-      {isFullscreen && selectedImage && (
-        <FullscreenImage 
-          imageSrc={selectedImage.binaryString} 
-          isPurchased={selectedImage.isPurchased}
-          imageId={selectedImage.id.toString()}  
-          onClose={handleCloseFullscreen}
-          isMobile={isMobile}
-          date={selectedImage.date}  
-        />
-      )}
-      {showPayPopup && (
-        <PayPopup 
-          onClose={handlePayPopupClose}
-          imageIds={images.filter(image => !image.isPurchased).map(image => image.id)}
-          showAllPhotosOnly={true}
-        />
-      )}
-    </Container>
+    <FocusTrap active={focusEnabled}>
+      <Container>
+        <PhotoGrid>
+          {images.slice(0, displayedImages).map((image, index) => (
+            <ImageWrapper
+              key={image.id}
+              style={{
+                border: image.isLoading ? '0.3px solid var(--button-hover-color)' : 'none',
+                backgroundColor: image.isLoading ? 'rgba(51, 0, 204, 0.05)' : 'transparent',
+              }}
+              tabIndex={index + 1} 
+            >
+              {image.isLoading ? (
+                <SpinnerWrapper>
+                  <ThreeCircles
+                    visible={true}
+                    height="100"
+                    width="100"
+                    color="#3300CC"
+                    ariaLabel="three-circles-loading"
+                    wrapperStyle={{}}
+                    wrapperClass=""
+                  />
+                </SpinnerWrapper>
+              ) : (
+                <img src={image.binaryString} alt="Photo" onClick={() => handleImageClick(image)} />
+              )}
+            </ImageWrapper>
+          ))}
+        </PhotoGrid>
+        {displayedImages < images.length && (
+          <LoadMoreButton onClick={loadMorePhotos}>
+            Load more
+          </LoadMoreButton>
+        )}
+        {!areAllImagesPurchased && (
+          <Button 
+            tabIndex={images.length + 1}  
+            onClick={handleUnlockPhotosClick}
+          >
+            Unlock your photos
+          </Button> 
+        )}
+        <Footer />
+        {isFullscreen && selectedImage && (
+          <FullscreenImage 
+            imageSrc={selectedImage.binaryString} 
+            isPurchased={selectedImage.isPurchased}
+            imageId={selectedImage.id.toString()}  
+            onClose={handleCloseFullscreen}
+            isMobile={isMobile}
+            date={selectedImage.date}  
+          />
+        )}
+        {showPayPopup && (
+          <PayPopup 
+            onClose={handlePayPopupClose}
+            imageIds={images.filter(image => !image.isPurchased).map(image => image.id)}
+            showAllPhotosOnly={true}
+          />
+        )}
+      </Container>
+    </FocusTrap>
   );
 };
 

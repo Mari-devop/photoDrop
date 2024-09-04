@@ -120,11 +120,6 @@ export const CloseButton = styled.button`
   font-size: 36px;
   cursor: pointer;
   padding: 0;
-
-    &:focus {
-        outline: none; 
-        box-shadow: 0 0 0 3px #3300CC8A; 
-    }
 `;
 
 export const FullscreenContainer = styled.div`
@@ -157,11 +152,6 @@ export const DownloadButton = styled.a`
     gap: 5px;
     width: 58px;
     height: 37px;
-
-    &:focus {
-        outline: none; 
-        box-shadow: 0 0 0 3px #3300CC8A; 
-    }
 `;
 
 export const SeeInFrameButton = styled.button`

@@ -3,4 +3,5 @@ export interface Image {
     binaryString: string;
     isPurchased: boolean;
     date: string;
+    
 };

@@ -19,12 +19,10 @@ import { Elements } from '@stripe/react-stripe-js';
 import PaymentPage from './components/PaymentPage/PaymentPage';
 import ThankU from './components/thanku/ThankU';
 
-
 const stripePromise = loadStripe("pk_test_51PqIRMRxh50Nc0qLf4KgICJ8Gb4lP7e4iOqZp0SJFlG9rIABwbfH0u09I708ArEEkN3VJ3lzojlUcuvwZ0IYXpcU00E7LfZZkG");
 
 function App() {
   const [otpSent, setOtpSent] = useState(false);
-
 
   return (
     <Elements stripe={stripePromise}>

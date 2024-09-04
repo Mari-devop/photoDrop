@@ -68,7 +68,9 @@ const Code = () => {
       });
   
       const { token } = response.data;
+      const expirationDate = new Date().getTime() + 60 * 60 * 1000; 
       localStorage.setItem('authToken', token);
+      localStorage.setItem('tokenExpiration', expirationDate.toString());
 
       const selfieCheckResponse = await axios.get('https://photodrop-dawn-surf-6942.fly.dev/client/info', {
         headers: { Authorization: `Bearer ${token}` }

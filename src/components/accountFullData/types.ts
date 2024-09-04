@@ -3,6 +3,7 @@ export interface Image {
     binaryString: string;
     isPurchased: boolean;
     date: string;
+    isLoading?: boolean;
 };
   
 export interface AlbumData {

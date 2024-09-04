@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import FocusTrap from 'focus-trap-react';
 import axios from 'axios';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { 
@@ -113,72 +114,77 @@ const PayPopup: React.FC<PayPopupProps> = ({ onClose, imageIds, showAllPhotosOnl
     const isAlbumDetailsPage = location.pathname.startsWith('/albumDetails') && decodedAlbumId;
 
     return (
-        <PayPopupContainer>
-            <InnerContainer>
-                <CloseIcon onClick={onClose} />
-                <Title>Unlock your photos</Title>
-                <Text>
-                    Download, view, and share your photos in hi-resolution with no watermark.
-                </Text>
-                {showAllPhotosOnly ? (
-                    <Row>
-                        <Input 
-                            type="radio" 
-                            name="photoOption" 
-                            id="photos" 
-                            checked={selectedOption === 'photos'} 
-                            readOnly
-                        />
-                        <Label htmlFor="photos">
-                            <span>All {unpaidPhotoCount} photos from {decodedAlbumId}</span> 
-                            <span>${totalPrice / 100}</span>
-                        </Label>
-                    </Row>
-                ) : (
-                    <>
+        <FocusTrap>
+            <PayPopupContainer>
+                <InnerContainer>
+                    <CloseIcon onClick={onClose} tabIndex={0} />
+                    <Title tabIndex={-1}>Unlock your photos</Title>
+                    <Text tabIndex={-1}>
+                        Download, view, and share your photos in hi-resolution with no watermark.
+                    </Text>
+                    {showAllPhotosOnly ? (
                         <Row>
                             <Input 
                                 type="radio" 
                                 name="photoOption" 
-                                id="photo" 
-                                checked={selectedOption === 'photo'} 
-                                onChange={() => setSelectedOption('photo')}
+                                id="photos" 
+                                checked={selectedOption === 'photos'} 
+                                readOnly
+                                tabIndex={0}
                             />
-                            <Label htmlFor="photo">
-                                <span>Current Photo</span>
-                                <span>${pricePerPhoto / 100}</span>
+                            <Label htmlFor="photos" tabIndex={0}>
+                                <span>All {unpaidPhotoCount} photos from {decodedAlbumId}</span> 
+                                <span>${totalPrice / 100}</span>
                             </Label>
                         </Row>
-                        {isAlbumDetailsPage && (
+                    ) : (
+                        <>
                             <Row>
                                 <Input 
                                     type="radio" 
                                     name="photoOption" 
-                                    id="photos" 
-                                    checked={selectedOption === 'photos'} 
-                                    onChange={() => setSelectedOption('photos')}
+                                    id="photo" 
+                                    checked={selectedOption === 'photo'} 
+                                    onChange={() => setSelectedOption('photo')}
+                                    tabIndex={0}
                                 />
-                                <Label htmlFor="photos">
-                                    <span>All {unpaidPhotoCount} photos from {decodedAlbumId}</span> 
-                                    <span>${totalPrice / 100}</span>
+                                <Label htmlFor="photo" tabIndex={0}>
+                                    <span>Current Photo</span>
+                                    <span>${pricePerPhoto / 100}</span>
                                 </Label>
                             </Row>
-                        )}
-                    </>
-                )}
-                <ApplePay 
-                    imageIds={allImageIds.length > 0 ? allImageIds : [singleImageId].filter((id): id is number => id !== null)}
-                    onClose={onClose}
-                    amount={calculatePrice()} 
-                />
-                <ButtonContainer>
-                    <Button onClick={() => handleCheckout('card')}>Checkout</Button>
-                    <ButtonPayPal onClick={() => handleCheckout('paypal')}>
-                        <img src={payPal} alt="PayPal" />
-                    </ButtonPayPal>
-                </ButtonContainer>
-            </InnerContainer>
-        </PayPopupContainer>
+                            {isAlbumDetailsPage && (
+                                <Row>
+                                    <Input 
+                                        type="radio" 
+                                        name="photoOption" 
+                                        id="photos" 
+                                        checked={selectedOption === 'photos'} 
+                                        onChange={() => setSelectedOption('photos')}
+                                        tabIndex={0}
+                                    />
+                                    <Label htmlFor="photos" tabIndex={0}>
+                                        <span>All {unpaidPhotoCount} photos from {decodedAlbumId}</span> 
+                                        <span>${totalPrice / 100}</span>
+                                    </Label>
+                                </Row>
+                            )}
+                        </>
+                    )}
+                    <ApplePay 
+                        imageIds={allImageIds.length > 0 ? allImageIds : [singleImageId].filter((id): id is number => id !== null)}
+                        onClose={onClose}
+                        amount={calculatePrice()} 
+                    />
+                    <ButtonContainer>
+                        <Button onClick={() => handleCheckout('card')} tabIndex={1}>Checkout</Button>
+                        <ButtonPayPal onClick={() => handleCheckout('paypal')} tabIndex={1}>
+                            <img src={payPal} alt="PayPal" />
+                        </ButtonPayPal>
+                    </ButtonContainer>
+                </InnerContainer>
+            </PayPopupContainer>
+        </FocusTrap>
     );
 }
 

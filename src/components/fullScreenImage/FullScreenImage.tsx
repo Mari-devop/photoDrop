@@ -22,12 +22,20 @@ const FullscreenImage: React.FC<FullscreenImageProps> = ({ imageSrc, isPurchased
     const [focusEnabled, setFocusEnabled] = useState(false);
 
     useEffect(() => {
+        document.body.style.overflow = 'hidden';
+
+        return () => {
+            document.body.style.overflow = '';
+        };
+    }, []);
+
+    useEffect(() => {
         const handleKeyDown = (event: KeyboardEvent) => {
             if (event.key === 'Escape') {
                 onClose();
             }
 
-            if (event.key === 'Tab') {
+            if (event.key === 'Tab' && !showPayPopup) {
                 setFocusEnabled(true); 
             }
         };
@@ -37,7 +45,7 @@ const FullscreenImage: React.FC<FullscreenImageProps> = ({ imageSrc, isPurchased
         return () => {
             document.removeEventListener('keydown', handleKeyDown);
         };
-    }, [onClose]);
+    }, [onClose, showPayPopup]);
 
     const togglePayPopup = () => {
       setShowPayPopup(!showPayPopup);
@@ -94,7 +102,7 @@ const FullscreenImage: React.FC<FullscreenImageProps> = ({ imageSrc, isPurchased
     };
 
     return (
-        <FocusTrap active={focusEnabled}>
+        <FocusTrap active={focusEnabled && !showPayPopup}>
             <FullscreenContainer>
                 <CloseButton onClick={onClose} tabIndex={focusEnabled ? 2 : -1}>×</CloseButton>
                 <img 
@@ -124,22 +132,24 @@ const FullscreenImage: React.FC<FullscreenImageProps> = ({ imageSrc, isPurchased
                     )}
                 </div>
                 {showPayPopup && (
-                    <PayPopup 
-                        onClose={togglePayPopup} 
-                        imageIds={[Number(imageId)]}   
+                    <FocusTrap active={true}>
+                        <PayPopup 
+                            onClose={togglePayPopup} 
+                            imageIds={[Number(imageId)]}   
+                        />
+                    </FocusTrap>
+                )}
+                {showSharePopup && (
+                    <SharePopup 
+                        selectedImage={{ 
+                            binaryString: imageSrc, 
+                            id: Number(imageId), 
+                            isPurchased,           
+                            date                   
+                        }}  
+                        onClose={toggleSharePopup}  
                     />
                 )}
-            {showSharePopup && (
-                <SharePopup 
-                    selectedImage={{ 
-                        binaryString: imageSrc, 
-                        id: Number(imageId), 
-                        isPurchased,           
-                        date                   
-                    }}  
-                    onClose={toggleSharePopup}  
-                />
-            )}
             </FullscreenContainer>
         </FocusTrap>
     );
