@@ -108,7 +108,11 @@ const PayPopup: React.FC<PayPopupProps> = ({ onClose, imageIds, showAllPhotosOnl
             }
             selectedImageIds = [singleImageId].filter((id): id is number => id !== null);
         }
-        navigate('/payment', { state: { imageIds: selectedImageIds, price: selectedPrice, paymentMethod } });
+        if (selectedImageIds.length > 0) {
+            navigate('/payment', { state: { imageIds: selectedImageIds, price: selectedPrice, paymentMethod } });
+        } else {
+            console.error("No image IDs available for payment.");
+        }
     };
     
     const isAlbumDetailsPage = location.pathname.startsWith('/albumDetails') && decodedAlbumId;

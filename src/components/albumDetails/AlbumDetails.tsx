@@ -13,20 +13,15 @@ import { LoadMoreButton } from '../accountFullData/AccountFullData.styled';
 
 const AlbumDetails: React.FC = () => {
   const { albumId: locationName } = useParams<{ albumId: string }>(); 
-  const [images, setImages] = useState<Array<Image & { isLoading: boolean }>>([]);
+  const [images, setImages] = useState<Array<Image>>([]);
+  const [loadingImages, setLoadingImages] = useState<boolean[]>([]); // Состояние для отслеживания загрузки изображений
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [selectedImage, setSelectedImage] = useState<Image | null>(null);
   const [isMobile, setIsMobile] = useState<boolean>(window.innerWidth < 500);
   const [showPayPopup, setShowPayPopup] = useState(false);
   const navigate = useNavigate();
   const [focusEnabled, setFocusEnabled] = useState(false);
-  const [displayedImages, setDisplayedImages] = useState(3);
-
-  const loadingState = useRef({
-    currentPhotoIndex: 0,
-    totalPhotos: 0,
-    isLoading: false,
-  });
+  const [displayedImages, setDisplayedImages] = useState(9);
 
   useEffect(() => {
     const token = localStorage.getItem('authToken');
@@ -56,17 +51,50 @@ const AlbumDetails: React.FC = () => {
     };
   }, []);
 
-  const loadInitialContainers = (imageCount: number) => {
-    const initialImages = Array.from({ length: imageCount }, (_, index) => ({
-      id: index,
-      binaryString: '',
-      isPurchased: false,
-      date: '',
-      isLoading: true,
-    }));
+  useEffect(() => {
+    if (showPayPopup) {
+      document.body.style.overflow = 'hidden'; 
+    } else {
+      document.body.style.overflow = 'auto'; 
+    }
 
-    setImages(initialImages);
-    loadingState.current.totalPhotos = imageCount;
+    return () => {
+      document.body.style.overflow = 'auto'; 
+    };
+  }, [showPayPopup]);
+
+  const loadPhotos = async () => {
+    try {
+      const token = localStorage.getItem('authToken');
+      const albumResponse = await axios.get('https://photodrop-dawn-surf-6942.fly.dev/client/images', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (albumResponse.status === 200 && Array.isArray(albumResponse.data)) {
+        const selectedAlbum = albumResponse.data.find((album: any) => album.location === locationName);
+
+        if (selectedAlbum) {
+          const loadedImages = selectedAlbum.images.map((image: any) => ({
+            id: image.id, 
+            binaryString: '', 
+            isPurchased: image.isPurchased,
+            date: image.date
+          }));
+
+          setImages(loadedImages);
+          setLoadingImages(new Array(loadedImages.length).fill(true)); // Устанавливаем загрузку для всех изображений
+
+          navigate(`/albumDetails/${locationName}?photos=${selectedAlbum.images.length}&date=${selectedAlbum.images[0].date}`, { replace: true });
+
+          loadPhoto(0, selectedAlbum); 
+        }
+      }
+    } catch (error) {
+      console.error('Error loading album images:', error);
+    }
   };
 
   const loadPhoto = async (photoIndex: number, selectedAlbum: any) => {
@@ -89,43 +117,22 @@ const AlbumDetails: React.FC = () => {
 
         setImages(prevImages =>
           prevImages.map((img, idx) =>
-            idx === photoIndex ? { ...img, binaryString: imageSrc, isLoading: false } : img
+            idx === photoIndex ? { ...img, binaryString: imageSrc } : img
           )
         );
 
-        loadingState.current.currentPhotoIndex++;
+        setLoadingImages(prevLoading =>
+          prevLoading.map((loading, idx) =>
+            idx === photoIndex ? false : loading
+          )
+        ); 
 
-        if (loadingState.current.currentPhotoIndex < selectedAlbum.images.length) {
-          loadPhoto(loadingState.current.currentPhotoIndex, selectedAlbum);
+        if (photoIndex + 1 < selectedAlbum.images.length) {
+          setTimeout(() => loadPhoto(photoIndex + 1, selectedAlbum), 500); 
         }
       }
     } catch (error) {
       console.error('Error loading image:', error);
-    }
-  };
-
-  const loadPhotos = async () => {
-    try {
-      const token = localStorage.getItem('authToken');
-      const albumResponse = await axios.get('https://photodrop-dawn-surf-6942.fly.dev/client/images', {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (albumResponse.status === 200 && Array.isArray(albumResponse.data)) {
-        const selectedAlbum = albumResponse.data.find((album: any) => album.location === locationName);
-
-        if (selectedAlbum) {
-          loadInitialContainers(selectedAlbum.images.length);
-          navigate(`/albumDetails/${locationName}?photos=${selectedAlbum.images.length}&date=${selectedAlbum.images[0].date}`, { replace: true });
-
-          loadPhoto(loadingState.current.currentPhotoIndex, selectedAlbum);
-        }
-      }
-    } catch (error) {
-      console.error('Error loading album images:', error);
     }
   };
 
@@ -143,10 +150,15 @@ const AlbumDetails: React.FC = () => {
     setSelectedImage(null);
   };
 
-  const areAllImagesPurchased = images.every(image => image.isPurchased);
-
   const handleUnlockPhotosClick = () => {
-    setShowPayPopup(true);
+    const unpaidImages = images.filter(image => !image.isPurchased);
+    if (unpaidImages.length > 0) {
+      const unpaidImageIds = unpaidImages.map(image => image.id);
+      setShowPayPopup(true);
+      navigate('/payment', { state: { imageIds: unpaidImageIds, price: unpaidImageIds.length * 100, paymentMethod: 'card' } });
+    } else {
+      alert("No photos available for purchase.");
+    }
   };
 
   const handlePayPopupClose = () => {
@@ -154,9 +166,11 @@ const AlbumDetails: React.FC = () => {
   };
 
   const loadMorePhotos = () => {
-    setDisplayedImages(images.length); 
-  };
-  
+    const remainingImages = images.length - displayedImages;
+    const imagesToDisplay = remainingImages >= 9 ? 9 : remainingImages;
+    setDisplayedImages(prev => prev + imagesToDisplay); 
+  }
+
   return (
     <FocusTrap active={focusEnabled}>
       <Container>
@@ -165,12 +179,11 @@ const AlbumDetails: React.FC = () => {
             <ImageWrapper
               key={image.id}
               style={{
-                border: image.isLoading ? '0.3px solid var(--button-hover-color)' : 'none',
-                backgroundColor: image.isLoading ? 'rgba(51, 0, 204, 0.05)' : 'transparent',
+                backgroundColor: 'transparent',
               }}
-              tabIndex={index + 1} 
+              tabIndex={index + 1}
             >
-              {image.isLoading ? (
+              {loadingImages[index] ? (
                 <SpinnerWrapper>
                   <ThreeCircles
                     visible={true}
@@ -178,12 +191,19 @@ const AlbumDetails: React.FC = () => {
                     width="100"
                     color="#3300CC"
                     ariaLabel="three-circles-loading"
-                    wrapperStyle={{}}
-                    wrapperClass=""
                   />
                 </SpinnerWrapper>
               ) : (
-                <img src={image.binaryString} alt="Photo" onClick={() => handleImageClick(image)} />
+                <img
+                  src={image.binaryString}
+                  alt="Photo"
+                  onClick={() => handleImageClick(image)}
+                  className="fade-in"
+                  style={{
+                    transition: 'opacity 0.5s ease-in-out',
+                    opacity: loadingImages[index] ? 0 : 1,
+                  }}
+                />
               )}
             </ImageWrapper>
           ))}
@@ -193,7 +213,7 @@ const AlbumDetails: React.FC = () => {
             Load more
           </LoadMoreButton>
         )}
-        {!areAllImagesPurchased && (
+        {!images.every(image => image.isPurchased) && (
           <Button 
             tabIndex={images.length + 1}  
             onClick={handleUnlockPhotosClick}

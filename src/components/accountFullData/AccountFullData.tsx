@@ -28,7 +28,7 @@ const AccountFullData: React.FC<AccountFullDataProps> = ({ imagesData }) => {
   const [selectedImage, setSelectedImage] = useState<Image | null>(null);
   const [isMobile, setIsMobile] = useState<boolean>(window.innerWidth < 500);
   const [animationStep, setAnimationStep] = useState(0); 
-  const [displayedImages, setDisplayedImages] = useState(6);
+  const [displayedImages, setDisplayedImages] = useState(9);
   const loadingState = useRef({
     currentAlbumIndex: 0,
     currentPhotoIndex: 0,
@@ -153,7 +153,9 @@ const AccountFullData: React.FC<AccountFullDataProps> = ({ imagesData }) => {
   }, []);
 
   const loadMorePhotos = () => {
-    setDisplayedImages(albums.flatMap(album => album.images).length); 
+    const totalImages = albums.flatMap(album => album.images).length; 
+    const newDisplayedCount = displayedImages + 9;
+    setDisplayedImages(newDisplayedCount > totalImages ? totalImages : newDisplayedCount);
   };
 
   return (

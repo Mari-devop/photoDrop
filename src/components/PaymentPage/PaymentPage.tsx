@@ -25,6 +25,7 @@ const PaymentPage: React.FC<PaymentPageProps> = () => {
     
         const fetchClientSecret = async () => {
             const token = localStorage.getItem('authToken');
+    
             const response = await fetch('https://photodrop-dawn-surf-6942.fly.dev/client/payment', {
                 method: 'POST',
                 headers: {
@@ -33,12 +34,17 @@ const PaymentPage: React.FC<PaymentPageProps> = () => {
                 },
                 body: JSON.stringify({ imageIds, price, paymentMethod }),
             });
+            if (!response.ok) {
+                const errorMessage = await response.text();
+                throw new Error(`Failed to fetch client secret: ${response.statusText} - ${errorMessage}`);
+            }
             const data = await response.json();
             console.log("Received clientSecret:", data.client_secret); 
             setClientSecret(data.client_secret);
         };
         fetchClientSecret();
     }, [imageIds, price, paymentMethod]);
+    
 
     const handleClose = () => {
         navigate(-1); 

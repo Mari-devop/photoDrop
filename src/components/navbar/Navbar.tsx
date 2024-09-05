@@ -29,6 +29,18 @@ const Navbar = () => {
   const date = searchParams.get('date');
 
   useEffect(() => {
+    if (showPayPopup) {
+      document.body.style.overflow = 'hidden'; 
+    } else {
+      document.body.style.overflow = 'auto'; 
+    }
+
+    return () => {
+      document.body.style.overflow = 'auto'; 
+    };
+  }, [showPayPopup]);
+
+  useEffect(() => {
     const fetchSelfie = async () => {
       const token = localStorage.getItem('authToken');
       if (!token) {
