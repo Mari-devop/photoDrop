@@ -175,11 +175,12 @@ const PayPopup: React.FC<PayPopupProps> = ({ onClose, imageIds, showAllPhotosOnl
                             )}
                         </>
                     )}
-                    <ApplePay 
-                        imageIds={allImageIds.length > 0 ? allImageIds : [singleImageId].filter((id): id is number => id !== null)}
+                   <ApplePay 
+                        imageIds={selectedOption === 'photos' ? allImageIds : [singleImageId].filter((id): id is number => id !== null)}
                         onClose={onClose}
-                        amount={calculatePrice()} 
+                        amount={selectedOption === 'photos' ? totalPrice : pricePerPhoto}
                     />
+
                     <ButtonContainer>
                         <Button onClick={() => handleCheckout('card')} tabIndex={1}>Checkout</Button>
                         <ButtonPayPal onClick={() => handleCheckout('paypal')} tabIndex={1}>

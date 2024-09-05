@@ -14,7 +14,7 @@ import { LoadMoreButton } from '../accountFullData/AccountFullData.styled';
 const AlbumDetails: React.FC = () => {
   const { albumId: locationName } = useParams<{ albumId: string }>(); 
   const [images, setImages] = useState<Array<Image>>([]);
-  const [loadingImages, setLoadingImages] = useState<boolean[]>([]); // Состояние для отслеживания загрузки изображений
+  const [loadingImages, setLoadingImages] = useState<boolean[]>([]); 
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [selectedImage, setSelectedImage] = useState<Image | null>(null);
   const [isMobile, setIsMobile] = useState<boolean>(window.innerWidth < 500);
@@ -153,9 +153,7 @@ const AlbumDetails: React.FC = () => {
   const handleUnlockPhotosClick = () => {
     const unpaidImages = images.filter(image => !image.isPurchased);
     if (unpaidImages.length > 0) {
-      const unpaidImageIds = unpaidImages.map(image => image.id);
       setShowPayPopup(true);
-      navigate('/payment', { state: { imageIds: unpaidImageIds, price: unpaidImageIds.length * 100, paymentMethod: 'card' } });
     } else {
       alert("No photos available for purchase.");
     }

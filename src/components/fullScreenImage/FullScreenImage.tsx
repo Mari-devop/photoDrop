@@ -110,41 +110,32 @@ const FullscreenImage: React.FC<FullscreenImageProps> = ({ imageSrc, isPurchased
 
     const handleDownloadClick = () => {
         try {
-            const downloadSrc = highQualitySrc || imageSrc;
+            const downloadSrc = highQualitySrc || imageSrc; 
             if (typeof downloadSrc === 'string') {
                 if (isBase64(downloadSrc)) {
-                    const blob = dataURItoBlob(downloadSrc);
+                    const blob = dataURItoBlob(downloadSrc); 
                     const url = URL.createObjectURL(blob);
                     const a = document.createElement('a');
                     a.href = url;
-                    a.download = `image_${imageId}.jpeg`;
-                    document.body.appendChild(a);
-                    a.click();
-                    document.body.removeChild(a);
-                    URL.revokeObjectURL(url);
+                    a.download = `image_${imageId}.jpeg`; 
+                    document.body.appendChild(a); 
+                    a.click(); 
+                    document.body.removeChild(a); 
+                    URL.revokeObjectURL(url); 
                 } else {
                     const a = document.createElement('a');
                     a.href = downloadSrc;
-                    a.download = `image_${imageId}.jpeg`;
-                    document.body.appendChild(a);
-                    a.click();
-                    document.body.removeChild(a);
+                    a.download = `image_${imageId}.jpeg`; 
+                    document.body.appendChild(a); 
+                    a.click(); 
+                    document.body.removeChild(a); 
                 }
-            } else if (downloadSrc && typeof downloadSrc === 'object' && 'byteLength' in downloadSrc) {
-                const blob = bufferToBlob(downloadSrc, 'image/jpeg');
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `image_${imageId}.jpeg`;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
             }
         } catch (error) {
             console.error("Download error: ", error);
         }
     };
+    
 
     return (
         <FocusTrap active={focusEnabled && !showPayPopup}>

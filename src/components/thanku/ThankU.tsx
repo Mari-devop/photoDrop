@@ -22,7 +22,7 @@ const ThankU = () => {
   return (
     <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
       <Container>
-        <Title>Thank you!!!!</Title>
+        <Title>Thank you</Title>
 
         {isFullAlbumPurchased ? (
           <Subtitle>The album <span>{albumName}</span> is now unlocked.</Subtitle>

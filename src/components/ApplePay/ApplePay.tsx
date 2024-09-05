@@ -81,7 +81,13 @@ const ApplePay: React.FC<ApplePayProps> = ({ imageIds, onClose, amount }) => {
 
         if (paymentIntent && paymentIntent.status === 'succeeded') {
           onClose();
-          navigate('/success');
+          navigate('/success', {
+            state: {
+              albumName: 'Your Album Name', 
+              purchasedPhotos: imageIds, 
+              totalPhotosInAlbum: imageIds.length, 
+            }
+          });
         } else {
           console.error('Payment failed or incomplete:', paymentIntent);
         }
