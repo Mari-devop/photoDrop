@@ -179,7 +179,8 @@ const AlbumDetails: React.FC = () => {
             <ImageWrapper
               key={image.id}
               style={{
-                backgroundColor: 'transparent',
+                border: loadingImages[index] ? '0.3px solid var(--button-hover-color)' : 'none',
+                backgroundColor: loadingImages[index] ? 'rgba(51, 0, 204, 0.05)' : 'transparent',
               }}
               tabIndex={index + 1}
             >
