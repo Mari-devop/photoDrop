@@ -56,7 +56,7 @@ const Navbar = () => {
           }
         );
 
-        const selfieData = response.data?.selfie?.selfie?.data;
+        const selfieData = response.data?.selfie?.data;
 
         if (selfieData && Array.isArray(selfieData)) {
           const byteArray = new Uint8Array(selfieData);
@@ -64,6 +64,7 @@ const Navbar = () => {
           const imageUrl = URL.createObjectURL(blob);
 
           setSelfieSrc(imageUrl);
+          localStorage.setItem('selfieSrc', imageUrl); 
         } else {
           console.error('Invalid selfie data structure:', selfieData);
         }
@@ -153,13 +154,14 @@ const Navbar = () => {
           <img src={logo} alt="logo" />
        </Link>
       )}
-      {location.pathname === '/account' && selfieSrc && (
+     {location.pathname === '/account' && (
         <SelfieContainer>
           <Link to="/accountsettings">
             <SelfieImage src={selfieSrc || selfiePlaceholder} alt="selfie" />
           </Link>
         </SelfieContainer>
       )}
+
       {isAlbumDetailsPage && (
         <Context>
           <div>

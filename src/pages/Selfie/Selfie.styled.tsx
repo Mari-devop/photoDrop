@@ -4,6 +4,7 @@ export const Image = styled.img`
     width: 181px;
     height: 181px;
     margin: 0 auto;
+      z-index: 1000;
 `;
 
 export const Subtitle = styled.p`

@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Cropper, { Area } from 'react-easy-crop';
 import { Overlay, SelfieContainer, Title, CloseIcon, InnerContainer, Text, ButtonContainer, ButtonRetake, ButtonSave } from './SelfieEdit.styled';
 import { getCroppedImg } from '../../utils/CropImage';
@@ -8,22 +8,42 @@ const SelfieEdit = ({ onClose, tempSelfieSrc, onRetake, onSave }: SelfieEditProp
   const [crop, setCrop] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
   const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null);
+  const [selfieSource, setSelfieSource] = useState<string | null>(null); 
+
+  useEffect(() => {
+    const loadSelfie = () => {
+      if (tempSelfieSrc) {
+        setSelfieSource(tempSelfieSrc);
+        console.log('Selfie loaded from tempSelfieSrc:', tempSelfieSrc);
+      } else {
+        const storedSelfie = localStorage.getItem('selfieSrc');
+        if (storedSelfie) {
+          setSelfieSource(storedSelfie);
+          console.log('Selfie loaded from localStorage:', storedSelfie);
+        } else {
+          console.error('No selfie found in localStorage');
+        }
+      }
+    };
+
+    loadSelfie();
+  }, [tempSelfieSrc]);
 
   const onCropComplete = useCallback((croppedArea: Area, croppedAreaPixels: Area) => {
     setCroppedAreaPixels(croppedAreaPixels);
   }, []);
 
   const handleSave = useCallback(async () => {
-    if (tempSelfieSrc && croppedAreaPixels) {
+    if (selfieSource && croppedAreaPixels) {
       try {
-        const croppedImageBuffer = await getCroppedImg(tempSelfieSrc, croppedAreaPixels);
-        onSave(croppedImageBuffer);
+        const croppedImageBuffer = await getCroppedImg(selfieSource, croppedAreaPixels);
+        onSave(croppedImageBuffer);  
         onClose(); 
       } catch (error) {
-        console.error(error);
+        console.error('Error saving cropped image:', error);
       }
     }
-  }, [tempSelfieSrc, croppedAreaPixels, onSave, onClose]);
+  }, [selfieSource, croppedAreaPixels, onSave, onClose]);
 
   return (
     <>
@@ -45,35 +65,39 @@ const SelfieEdit = ({ onClose, tempSelfieSrc, onRetake, onSave }: SelfieEditProp
               backgroundColor: 'transparent' 
             }}
           >
-            <Cropper 
-              image={tempSelfieSrc || undefined}
-              crop={crop}
-              zoom={zoom}
-              aspect={1} 
-              onCropChange={setCrop}
-              onZoomChange={setZoom}
-              onCropComplete={onCropComplete}
-              style={{
-                cropAreaStyle: { 
-                  display: 'none'
-                },
-                containerStyle: { 
-                  borderRadius: '50%', 
-                  width: '100%', 
-                  height: '100%',
-                  backgroundColor: 'transparent', 
-                  boxSizing: 'border-box',
-                  overflow: 'hidden', 
-                },
-                mediaStyle: { 
-                  borderRadius: '50%', 
-                  width: '100%', 
-                  height: '100%',
-                  objectFit: 'cover', 
-                }
-              }}
-              showGrid={false}  
-            />
+            {selfieSource ? (
+              <Cropper 
+                image={selfieSource} // Use selfieSource here
+                crop={crop}
+                zoom={zoom}
+                aspect={1} 
+                onCropChange={setCrop}
+                onZoomChange={setZoom}
+                onCropComplete={onCropComplete}
+                style={{
+                  cropAreaStyle: { 
+                    display: 'none'
+                  },
+                  containerStyle: { 
+                    borderRadius: '50%', 
+                    width: '100%', 
+                    height: '100%',
+                    backgroundColor: 'transparent', 
+                    boxSizing: 'border-box',
+                    overflow: 'hidden', 
+                  },
+                  mediaStyle: { 
+                    borderRadius: '50%', 
+                    width: '100%', 
+                    height: '100%',
+                    objectFit: 'cover', 
+                  }
+                }}
+                showGrid={false}  
+              />
+            ) : (
+              <p>No image to display</p> // Display a fallback if no image is available
+            )}
           </div>
           <ButtonContainer>
             <ButtonRetake onClick={onRetake}>Retake</ButtonRetake>
@@ -83,6 +107,6 @@ const SelfieEdit = ({ onClose, tempSelfieSrc, onRetake, onSave }: SelfieEditProp
       </SelfieContainer>
     </>
   );
-}
+};
 
 export default SelfieEdit;

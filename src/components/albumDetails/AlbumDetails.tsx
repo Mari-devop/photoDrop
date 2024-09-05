@@ -85,7 +85,7 @@ const AlbumDetails: React.FC = () => {
           }));
 
           setImages(loadedImages);
-          setLoadingImages(new Array(loadedImages.length).fill(true)); // Устанавливаем загрузку для всех изображений
+          setLoadingImages(new Array(loadedImages.length).fill(true)); 
 
           navigate(`/albumDetails/${locationName}?photos=${selectedAlbum.images.length}&date=${selectedAlbum.images[0].date}`, { replace: true });
 

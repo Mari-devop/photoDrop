@@ -52,7 +52,7 @@ const AccountSettings = () => {
           }
         );
 
-        const selfieData = response.data?.selfie?.selfie?.data;
+        const selfieData = response.data?.selfie?.data;
 
         if (selfieData && Array.isArray(selfieData)) {
           const byteArray = new Uint8Array(selfieData);

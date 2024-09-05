@@ -55,16 +55,21 @@ const Selfie = () => {
     }
   }, [navigate]);
 
+  useEffect(() => {
+    console.log("Selfie source updated:", selfieSrc);
+  }, [selfieSrc]);
+  
   return (
     <MainContainer>
       <Title>Add a selfie</Title>
       <Subtitle>A selfie allows your photos to be synced with your account.</Subtitle>
       <div style={{ position: 'relative' }}>
-        <Image 
-          src={selfieSrc || selfiePlaceholder} 
-          alt="selfie" 
-          style={{ borderRadius: selfieSrc ? '50%' : '0%' }} 
-        />
+      <Image 
+        src={selfieSrc || selfiePlaceholder} 
+        alt="selfie" 
+        style={{ borderRadius: selfieSrc ? '50%' : '0%', cursor: 'pointer' }} 
+        onClick={() => console.log('Selfie clicked!')}
+      />
         <RoundButton onClick={handleRoundButtonClick}>+</RoundButton>
       
         {showPopup && !isSmallScreen && (

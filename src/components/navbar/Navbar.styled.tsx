@@ -42,6 +42,9 @@ export const SelfieImage = styled.img`
     margin-right: 40px;
     height: 35px;
     width: 35px;
+    z-index: 9999;
+    position: relative;
+    pointer-events: auto;
 `;
 
 export const SelfieContainer = styled.div`
@@ -55,6 +58,7 @@ export const SelfieContainer = styled.div`
     align-items: center;
     justify-content: center;
     cursor: pointer;
+    z-index: 9999;
 
     a {
         text-decoration: none; 

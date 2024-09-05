@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import FocusTrap from 'focus-trap-react';
+
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { arrayBufferToBase64 } from '../../utils/ConverFunc';
@@ -35,7 +35,7 @@ const AccountFullData: React.FC<AccountFullDataProps> = ({ imagesData }) => {
     totalPhotos: 0,
     isLoading: false,
   });
-  const [focusEnabled, setFocusEnabled] = useState(false);
+
 
   const albumRefs = useRef<HTMLAnchorElement[]>([]);
   const photoRefs = useRef<HTMLImageElement[]>([]);
@@ -89,6 +89,7 @@ const AccountFullData: React.FC<AccountFullDataProps> = ({ imagesData }) => {
 
     try {
       const token = localStorage.getItem('authToken');
+      
       const imageResponse = await axios.get(`https://photodrop-dawn-surf-6942.fly.dev/client/image/${currentImage.id}`, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -148,9 +149,7 @@ const AccountFullData: React.FC<AccountFullDataProps> = ({ imagesData }) => {
     return () => clearInterval(intervalId);
   }, [albums]);
 
-  useEffect(() => {
-    setFocusEnabled(true); 
-  }, []);
+
 
   const loadMorePhotos = () => {
     const totalImages = albums.flatMap(album => album.images).length; 
@@ -159,7 +158,7 @@ const AccountFullData: React.FC<AccountFullDataProps> = ({ imagesData }) => {
   };
 
   return (
-    <FocusTrap active={focusEnabled}>
+   
       <Container>
         <FirstRow className={`fade-in ${animationStep >= 2 ? 'fade-in-visible' : ''}`}>
           <Subtitle>Albums</Subtitle>
@@ -169,7 +168,7 @@ const AccountFullData: React.FC<AccountFullDataProps> = ({ imagesData }) => {
                 to={`/albumDetails/${encodeURIComponent(album.locationName)}`}
                 key={index}
                 ref={(el) => (albumRefs.current[index] = el!)}
-                tabIndex={index + 1}
+               
               >
                 <Album className={`fade-in ${animationStep >= 2 ? 'fade-in-visible' : ''}`}>
                   {album.images[0] && (
@@ -215,7 +214,7 @@ const AccountFullData: React.FC<AccountFullDataProps> = ({ imagesData }) => {
                     src={image.binaryString}
                     alt={`Im ${image.id}`}
                     ref={(el) => (photoRefs.current[idx] = el!)}
-                    tabIndex={albums.length + idx + 1}
+                   
                     onClick={() => handleImageClick(image)}
                   />
                 )}
@@ -244,7 +243,7 @@ const AccountFullData: React.FC<AccountFullDataProps> = ({ imagesData }) => {
           />
         )}
       </Container>
-    </FocusTrap>
+
   );
 };
 

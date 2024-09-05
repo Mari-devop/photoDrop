@@ -79,13 +79,16 @@ export const useSelfie = () => {
       const formData = new FormData();
       const blob = new Blob([selfieArrayBuffer], { type: 'image/jpeg' });
       formData.append("images", blob, "selfie.jpg");
-
+  
       if (token) {
         await axios.put('https://photodrop-dawn-surf-6942.fly.dev/client/editSelfie', formData, {
           headers: { Authorization: `Bearer ${token}` }
         });
-
-        setSelfieSrc(URL.createObjectURL(blob)); 
+  
+        const selfieURL = URL.createObjectURL(blob);
+        setSelfieSrc(selfieURL);
+        
+        localStorage.setItem('selfieSrc', selfieURL);
         setShowSelfieEdit(false);
       }
     } catch (error) {
@@ -93,7 +96,7 @@ export const useSelfie = () => {
       alert('Failed to save selfie. Please try again.');
     }
   };
-
+  
   const handleRetake = () => {
     setTempSelfieSrc(null); 
     setShowSelfieEdit(false); 
