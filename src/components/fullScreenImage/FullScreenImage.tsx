@@ -26,10 +26,9 @@ const arrayBufferToBase64 = (buffer: ArrayBuffer): string => {
     return window.btoa(binary);
 };
 
-const FullscreenImage: React.FC<FullscreenImageProps> = ({ imageSrc, isPurchased, imageId, onClose, isMobile, date }) => {
+const FullscreenImage: React.FC<FullscreenImageProps> = ({ imageSrc: selectedImage, isPurchased, imageId, onClose, isMobile, date, isHighQuality }) => {
     const [showPayPopup, setShowPayPopup] = useState(false);
     const [showSharePopup, setShowSharePopup] = useState(false); 
-    const [highQualitySrc, setHighQualitySrc] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState<boolean>(false); 
     const imgRef = useRef<HTMLImageElement>(null);
     const [focusEnabled, setFocusEnabled] = useState(false);
@@ -61,35 +60,41 @@ const FullscreenImage: React.FC<FullscreenImageProps> = ({ imageSrc, isPurchased
     }, [onClose, showPayPopup]);
 
     useEffect(() => {
-        if (isPurchased) {
-            const token = localStorage.getItem('authToken'); 
-            setIsLoading(true); 
-            fetch(`https://photodrop-dawn-surf-6942.fly.dev/client/fullImage/${imageId}`, {
-                method: 'GET',
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json',
-                },
-            })
-            .then((response) => {
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
+        const fetchHighQualityImage = async () => {
+            if (isPurchased && !isHighQuality) {
+                const token = localStorage.getItem('authToken');
+                setIsLoading(true);
+                
+                try {
+                    const response = await fetch(`https://photodrop-dawn-surf-6942.fly.dev/client/fullImage/${imageId}`, {
+                        method: 'GET',
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json',
+                        },
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+
+                    const data = await response.json();
+                    const byteArray = new Uint8Array(data.imageData.data);
+                    const base64String = arrayBufferToBase64(byteArray.buffer);
+                    const highQualityImage = `data:image/jpeg;base64,${base64String}`;
+                    
+                    //setHighQualitySrc(highQualityImage);
+                    selectedImage.binaryString = highQualityImage;
+                } catch (error) {
+                    console.error('Error loading high quality image', error);
+                } finally {
+                    setIsLoading(false);
                 }
-                return response.json();
-            })
-            .then((data) => {
-                const byteArray = new Uint8Array(data.imageData.data);
-                const base64String = arrayBufferToBase64(byteArray.buffer); 
-                const highQualityImage = `data:image/jpeg;base64,${base64String}`;
-                setHighQualitySrc(highQualityImage); 
-                setIsLoading(false); 
-            })
-            .catch((error) => {
-                console.error('Error loading in high quality', error);
-                setIsLoading(false); 
-            });
-        }
-    }, [isPurchased, imageId]);
+            }
+        };
+
+        fetchHighQualityImage();
+    }, [isPurchased, imageId, selectedImage, isHighQuality]);
 
     const togglePayPopup = () => {
         setShowPayPopup(!showPayPopup);
@@ -110,7 +115,10 @@ const FullscreenImage: React.FC<FullscreenImageProps> = ({ imageSrc, isPurchased
 
     const handleDownloadClick = () => {
         try {
-            const downloadSrc = highQualitySrc || imageSrc; 
+            if (isLoading) {
+                return;
+            }
+            const downloadSrc = selectedImage.binaryString; 
             if (typeof downloadSrc === 'string') {
                 if (isBase64(downloadSrc)) {
                     const blob = dataURItoBlob(downloadSrc); 
@@ -156,9 +164,9 @@ const FullscreenImage: React.FC<FullscreenImageProps> = ({ imageSrc, isPurchased
 
                 <img 
                     ref={imgRef}
-                    src={highQualitySrc || imageSrc}  
+                    src={selectedImage.binaryString}  
                     alt="fullscreen" 
-                    style={{ width: '100%', height: '100%', objectFit: 'contain', display: isLoading ? 'none' : 'block' }} 
+                    style={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block'}}  //was before-->display: isLoading ? 'block' : 'block'
                 />
 
                 <div style={{ position: 'absolute', bottom: '30px', right: '40px', display: 'flex', gap: '29px', alignItems: 'center' }}>
@@ -190,7 +198,7 @@ const FullscreenImage: React.FC<FullscreenImageProps> = ({ imageSrc, isPurchased
                 {showSharePopup && (
                     <SharePopup 
                         selectedImage={{ 
-                            binaryString: imageSrc, 
+                            binaryString: selectedImage.binaryString, 
                             id: Number(imageId), 
                             isPurchased,           
                             date                   
