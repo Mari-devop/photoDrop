@@ -3,7 +3,7 @@ import FocusTrap from 'focus-trap-react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { arrayBufferToBase64 } from '../../utils/ConverFunc';
-import { Image } from './types';
+import { Image as myImage } from './types';
 import { Container, PhotoGrid, Button, ImageWrapper, SpinnerWrapper } from './AlbumDetails.styled';
 import Footer from '../footer/Footer';
 import FullscreenImage from '../fullScreenImage/FullScreenImage';
@@ -13,15 +13,16 @@ import { LoadMoreButton } from '../accountFullData/AccountFullData.styled';
 
 const AlbumDetails: React.FC = () => {
   const { albumId: locationName } = useParams<{ albumId: string }>(); 
-  const [images, setImages] = useState<Array<Image>>([]);
+  const [images, setImages] = useState<Array<myImage>>([]);
   const [loadingImages, setLoadingImages] = useState<boolean[]>([]); 
   const [isFullscreen, setIsFullscreen] = useState(false);
-  const [selectedImage, setSelectedImage] = useState<Image | null>(null);
+  const [selectedImage, setSelectedImage] = useState<myImage | null>(null);
   const [isMobile, setIsMobile] = useState<boolean>(window.innerWidth < 500);
   const [showPayPopup, setShowPayPopup] = useState(false);
   const navigate = useNavigate();
   const [focusEnabled, setFocusEnabled] = useState(false);
   const [displayedImages, setDisplayedImages] = useState(9);
+  const [isHighQualityImage, setHighQualityImage] = useState(false);
 
   useEffect(() => {
     const token = localStorage.getItem('authToken');
@@ -140,7 +141,9 @@ const AlbumDetails: React.FC = () => {
     loadPhotos();
   }, [locationName]);
 
-  const handleImageClick = (image: Image) => {
+  const handleImageClick = async (image: myImage) => {
+    const isHighQualityImage = await isHighQuality(image.binaryString);
+    setHighQualityImage(isHighQualityImage);
     setSelectedImage(image);
     setIsFullscreen(true);
   };
@@ -168,6 +171,14 @@ const AlbumDetails: React.FC = () => {
     const imagesToDisplay = remainingImages >= 9 ? 9 : remainingImages;
     setDisplayedImages(prev => prev + imagesToDisplay); 
   }
+
+  const isHighQuality = (imgSrc: string) => {
+    const img = new Image();
+    img.src = imgSrc;
+    return new Promise<boolean>((resolve) => {
+      img.onload = () => resolve(img.width > 600); 
+    });
+  };
 
   return (
     <FocusTrap active={focusEnabled}>
@@ -223,12 +234,13 @@ const AlbumDetails: React.FC = () => {
         <Footer />
         {isFullscreen && selectedImage && (
           <FullscreenImage 
-            imageSrc={selectedImage.binaryString} 
+            imageSrc={selectedImage} 
             isPurchased={selectedImage.isPurchased}
             imageId={selectedImage.id.toString()}  
             onClose={handleCloseFullscreen}
             isMobile={isMobile}
-            date={selectedImage.date}  
+            date={selectedImage.date}
+            isHighQuality={isHighQualityImage}  
           />
         )}
         {showPayPopup && (
