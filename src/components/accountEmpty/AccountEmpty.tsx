@@ -66,6 +66,7 @@ const AccountEmpty = () => {
   
       {isFullscreen && selectedImage && (
         <FullscreenImage 
+        // @ts-ignore
           imageSrc={selectedImage} 
           isPurchased={true}  
           imageId={selectedImage} 

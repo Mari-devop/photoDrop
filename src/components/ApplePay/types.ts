@@ -3,4 +3,5 @@ export interface ApplePayProps {
     onClose: () => void; 
     amount: number; 
     albumName: string;
+    isAlbumPurchased: boolean;
 };

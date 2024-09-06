@@ -8,6 +8,7 @@ import {
     EmbeddedCheckoutContainer
 } from './PaymentPage.styled';
 import { PaymentPageProps } from './types';
+import queryString from 'query-string';
 
 const stripePromise = loadStripe("pk_test_51PqIRMRxh50Nc0qLf4KgICJ8Gb4lP7e4iOqZp0SJFlG9rIABwbfH0u09I708ArEEkN3VJ3lzojlUcuvwZ0IYXpcU00E7LfZZkG");
 
@@ -16,6 +17,7 @@ const PaymentPage: React.FC<PaymentPageProps> = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const { imageIds = [], price = 0, paymentMethod } = location.state || {};
+    const { album } = queryString.parse(location.search);
     
     useEffect(() => {
         if (imageIds.length === 0) {

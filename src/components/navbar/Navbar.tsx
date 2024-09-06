@@ -28,6 +28,8 @@ const Navbar = () => {
   const photoCount = searchParams.get('photos');
   const date = searchParams.get('date');
 
+  const { imageIds = [] } = location.state || {};
+
   useEffect(() => {
     if (showPayPopup) {
       document.body.style.overflow = 'hidden'; 
@@ -186,7 +188,7 @@ const Navbar = () => {
       {showPayPopup && (
         <PayPopup 
           onClose={handleClosePayPopup}
-          imageIds={[]} 
+          imageIds={imageIds}
           showAllPhotosOnly={true} 
           albumName={albumId} 
         />

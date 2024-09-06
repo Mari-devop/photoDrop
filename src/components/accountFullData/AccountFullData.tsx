@@ -1,9 +1,8 @@
 import React, { useEffect, useState, useRef } from 'react';
-
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { arrayBufferToBase64 } from '../../utils/ConverFunc';
-import { AlbumData, Image, AccountFullDataProps } from './types';
+import { AlbumData, Image as myImage, AccountFullDataProps } from './types';
 import {
   Container,
   Subtitle,
@@ -25,17 +24,17 @@ const AccountFullData: React.FC<AccountFullDataProps> = ({ imagesData }) => {
   const navigate = useNavigate();
   const [albums, setAlbums] = useState<AlbumData[]>([]);
   const [isFullscreen, setIsFullscreen] = useState(false);
-  const [selectedImage, setSelectedImage] = useState<Image | null>(null);
+  const [selectedImage, setSelectedImage] = useState<myImage | null>(null);
   const [isMobile, setIsMobile] = useState<boolean>(window.innerWidth < 500);
-  const [animationStep, setAnimationStep] = useState(0); 
+  const [animationStep, setAnimationStep] = useState(0);
   const [displayedImages, setDisplayedImages] = useState(9);
+  const [isHighQualityImage, setHighQualityImage] = useState(false);
   const loadingState = useRef({
     currentAlbumIndex: 0,
     currentPhotoIndex: 0,
     totalPhotos: 0,
     isLoading: false,
   });
-
 
   const albumRefs = useRef<HTMLAnchorElement[]>([]);
   const photoRefs = useRef<HTMLImageElement[]>([]);
@@ -54,7 +53,9 @@ const AccountFullData: React.FC<AccountFullDataProps> = ({ imagesData }) => {
     return () => window.removeEventListener('resize', handleResize);
   }, [navigate]);
 
-  const handleImageClick = (image: Image) => {
+  const handleImageClick = async (image: myImage) => {
+    const isHighQualityImage = await isHighQuality(image.binaryString);
+    setHighQualityImage(isHighQualityImage);
     setSelectedImage(image);
     setIsFullscreen(true);
   };
@@ -89,7 +90,7 @@ const AccountFullData: React.FC<AccountFullDataProps> = ({ imagesData }) => {
 
     try {
       const token = localStorage.getItem('authToken');
-      
+
       const imageResponse = await axios.get(`https://photodrop-dawn-surf-6942.fly.dev/client/image/${currentImage.id}`, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -129,7 +130,6 @@ const AccountFullData: React.FC<AccountFullDataProps> = ({ imagesData }) => {
     loadInitialContainers();
   }, [imagesData]);
 
-
   useEffect(() => {
     const timeouts = [
       setTimeout(() => setAnimationStep(1), 0), 
@@ -149,44 +149,49 @@ const AccountFullData: React.FC<AccountFullDataProps> = ({ imagesData }) => {
     return () => clearInterval(intervalId);
   }, [albums]);
 
-
-
   const loadMorePhotos = () => {
-    const totalImages = albums.flatMap(album => album.images).length; 
+    const totalImages = albums.flatMap(album => album.images).length;
     const newDisplayedCount = displayedImages + 9;
     setDisplayedImages(newDisplayedCount > totalImages ? totalImages : newDisplayedCount);
   };
 
-  return (
-   
-      <Container>
-        <FirstRow className={`fade-in ${animationStep >= 2 ? 'fade-in-visible' : ''}`}>
-          <Subtitle>Albums</Subtitle>
-          <AlbumContainer>
-            {albums.map((album, index) => (
-              <Link
-                to={`/albumDetails/${encodeURIComponent(album.locationName)}`}
-                key={index}
-                ref={(el) => (albumRefs.current[index] = el!)}
-               
-              >
-                <Album className={`fade-in ${animationStep >= 2 ? 'fade-in-visible' : ''}`}>
-                  {album.images[0] && (
-                    <>
-                      <img src={album.images[0].binaryString} alt={album.locationName} onClick={() => handleImageClick(album.images[0])} />
-                      <Text>{album.locationName}</Text>
-                    </>
-                  )}
-                </Album>
-              </Link>
-            ))}
-          </AlbumContainer>
-        </FirstRow>
+  const isHighQuality = (imgSrc: string) => {
+    const img = new Image();
+    img.src = imgSrc;
+    return new Promise<boolean>((resolve) => {
+      img.onload = () => resolve(img.width > 600); 
+    });
+  };
 
-        <SecondRow className={`fade-in ${animationStep >= 3 ? 'fade-in-visible' : ''}`}>
-          <Subtitle>All photos</Subtitle>
-          <PhotoContainer>
-            {albums.flatMap(album => album.images)
+  return (
+    <Container>
+      <FirstRow className={`fade-in ${animationStep >= 2 ? 'fade-in-visible' : ''}`}>
+        <Subtitle>Albums</Subtitle>
+        <AlbumContainer>
+          {albums.map((album, index) => (
+            <Link
+              to={`/albumDetails/${encodeURIComponent(album.locationName)}`}
+              key={index}
+              ref={(el) => (albumRefs.current[index] = el!)}
+
+            >
+              <Album className={`fade-in ${animationStep >= 2 ? 'fade-in-visible' : ''}`}>
+                {album.images[0] && (
+                  <>
+                    <img src={album.images[0].binaryString} alt={album.locationName} onClick={() => handleImageClick(album.images[0])} />
+                    <Text>{album.locationName}</Text>
+                  </>
+                )}
+              </Album>
+            </Link>
+          ))}
+        </AlbumContainer>
+      </FirstRow>
+
+      <SecondRow className={`fade-in ${animationStep >= 3 ? 'fade-in-visible' : ''}`}>
+        <Subtitle>All photos</Subtitle>
+        <PhotoContainer>
+          {albums.flatMap(album => album.images)
             .slice(0, displayedImages)
             .map((image, idx) => (
               <ImageWrapper
@@ -214,37 +219,37 @@ const AccountFullData: React.FC<AccountFullDataProps> = ({ imagesData }) => {
                     src={image.binaryString}
                     alt={`Im ${image.id}`}
                     ref={(el) => (photoRefs.current[idx] = el!)}
-                   
+
                     onClick={() => handleImageClick(image)}
                   />
                 )}
               </ImageWrapper>
             ))}
-          </PhotoContainer>
-          {displayedImages < albums.flatMap(album => album.images).length && (
-            <LoadMoreButton onClick={loadMorePhotos}>
-              Load more
-            </LoadMoreButton>
-          )}
-        </SecondRow>
-       
-        <div className={`fade-in ${animationStep >= 5 ? 'fade-in-visible' : ''}`}>
-          <Footer />
-        </div>
+        </PhotoContainer>
+        {displayedImages < albums.flatMap(album => album.images).length && (
+          <LoadMoreButton onClick={loadMorePhotos}>
+            Load more
+          </LoadMoreButton>
+        )}
+      </SecondRow>
+
+      <div className={`fade-in ${animationStep >= 5 ? 'fade-in-visible' : ''}`}>
+        <Footer />
+      </div>
 
         {isFullscreen && selectedImage && (
           <FullscreenImage
-            imageSrc={selectedImage.binaryString}
+            imageSrc={selectedImage}
             isPurchased={selectedImage.isPurchased}
             imageId={selectedImage.id.toString()}
             onClose={handleCloseFullscreen}
             isMobile={isMobile}
             date={selectedImage.date}
+            isHighQuality={isHighQualityImage}
             albumName={albums.find(album => album.images.includes(selectedImage))?.locationName || ''}
           />
         )}
       </Container>
-
   );
 };
 

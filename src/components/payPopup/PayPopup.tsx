@@ -30,6 +30,7 @@ const PayPopup: React.FC<PayPopupProps> = ({ onClose, imageIds, showAllPhotosOnl
     const [allImageIds, setAllImageIds] = useState<number[]>([]);
     const [unpaidPhotoCount, setUnpaidPhotoCount] = useState(0); 
     const [singleImageId, setSingleImageId] = useState<number | null>(null);
+    const [isAlbumPurchased, setIsAlbumPurchased] = useState(false);
     const navigate = useNavigate();
     const location = useLocation();
     const decodedAlbumId = decodeURIComponent(location.pathname.split("/").pop() || "");
@@ -54,6 +55,13 @@ const PayPopup: React.FC<PayPopupProps> = ({ onClose, imageIds, showAllPhotosOnl
                         .filter((image: any) => !image.isPurchased)
                         .map((image: any) => image.id);
                     
+                    const purchasedImageIds = albumData.images
+                         .filter((image: any) => image.isPurchased);
+                    
+
+                    if ((purchasedImageIds.length + imageIds.length) === albumData.images.length) {
+                         setIsAlbumPurchased(true);
+                    } 
                     if (unpurchasedImageIds.length > 0) {
                         setAllImageIds(unpurchasedImageIds);
                         setUnpaidPhotoCount(unpurchasedImageIds.length); 
@@ -117,18 +125,14 @@ const PayPopup: React.FC<PayPopupProps> = ({ onClose, imageIds, showAllPhotosOnl
     };
     
     const isAlbumDetailsPage = location.pathname.startsWith('/albumDetails') && decodedAlbumId;
-    const handleCloseClick = () => {
-        onClose();
-        document.body.style.overflow = 'auto'; 
-    };
 
     return (
-        <FocusTrap active={true}>
+        <FocusTrap>
             <PayPopupContainer>
                 <InnerContainer>
                     <CloseIcon onClick={onClose} tabIndex={0} />
-                    <Title tabIndex={-1}>Unlock your photos</Title>
-                    <Text tabIndex={-1}>
+                    <Title tabIndex={1}>Unlock your photos</Title>
+                    <Text tabIndex={2}>
                         Download, view, and share your photos in hi-resolution with no watermark.
                     </Text>
                     {showAllPhotosOnly ? (
@@ -139,7 +143,7 @@ const PayPopup: React.FC<PayPopupProps> = ({ onClose, imageIds, showAllPhotosOnl
                                 id="photos" 
                                 checked={selectedOption === 'photos'} 
                                 readOnly
-                                tabIndex={1}
+                                tabIndex={3}
                             />
                             <Label htmlFor="photos" tabIndex={-1}>
                                 <span>All {unpaidPhotoCount} photos from {decodedAlbumId}</span> 
@@ -155,7 +159,7 @@ const PayPopup: React.FC<PayPopupProps> = ({ onClose, imageIds, showAllPhotosOnl
                                     id="photo" 
                                     checked={selectedOption === 'photo'} 
                                     onChange={() => setSelectedOption('photo')}
-                                    tabIndex={2}
+                                    tabIndex={4}
                                 />
                                 <Label htmlFor="photo" tabIndex={-1}>
                                     <span>Current Photo</span>
@@ -170,7 +174,7 @@ const PayPopup: React.FC<PayPopupProps> = ({ onClose, imageIds, showAllPhotosOnl
                                         id="photos" 
                                         checked={selectedOption === 'photos'} 
                                         onChange={() => setSelectedOption('photos')}
-                                        tabIndex={3}
+                                        tabIndex={5}
                                     />
                                     <Label htmlFor="photos" tabIndex={-1}>
                                         <span>All {unpaidPhotoCount} photos from {decodedAlbumId}</span> 
@@ -185,11 +189,12 @@ const PayPopup: React.FC<PayPopupProps> = ({ onClose, imageIds, showAllPhotosOnl
                         onClose={onClose}
                         amount={selectedOption === 'photos' ? totalPrice : pricePerPhoto}
                         albumName={albumName}
+                        isAlbumPurchased={isAlbumPurchased} 
                     />
 
                     <ButtonContainer>
-                        <Button onClick={() => handleCheckout('card')} tabIndex={4}>Checkout</Button>
-                        <ButtonPayPal onClick={() => handleCheckout('paypal')} tabIndex={5}>
+                        <Button onClick={() => handleCheckout('card')} tabIndex={6}>Checkout</Button>
+                        <ButtonPayPal onClick={() => handleCheckout('paypal')} tabIndex={7}>
                             <img src={payPal} alt="PayPal" />
                         </ButtonPayPal>
                     </ButtonContainer>

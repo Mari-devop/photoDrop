@@ -2,27 +2,31 @@ import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Container, Text, Subtitle, SubContainer, Button } from './ThankU.styled';
 import { Title } from '../../styles/Global.styled';
+import queryString from 'query-string';
 
 const ThankU = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { albumName, purchasedPhotos = [], totalPhotosInAlbum = 0} = location.state || {};
+
+  const { albumName, purchasedPhotos = [], totalPhotosInAlbum = 0, isAlbumPurchased} = location.state || {};
+  const { album } = queryString.parse(location.search);
 
   const handleButtonClick = () => {
     navigate('/account');
   };
 
-  const isFullAlbumPurchased = purchasedPhotos?.length > 1 && purchasedPhotos?.length === totalPhotosInAlbum;
 
   return (
     <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
       <Container>
         <Title>Thank you</Title>
 
-        {isFullAlbumPurchased ? (
-          <Subtitle>The album <span>{albumName}</span> is now unlocked.</Subtitle>
+        {isAlbumPurchased ? (  
+          <Subtitle>The album1 <span>{albumName}</span> is now unlocked.</Subtitle>
+        ) : (album !== 'null' && album !== undefined && album !== null) ? (
+          <Subtitle>The album2 <span>{album}</span> is now unlocked.</Subtitle>
         ) : (
-          <Subtitle>Your photo is now unlocked.</Subtitle>
+          <Subtitle>Your photo are now unlocked.</Subtitle>
         )}
 
         <Text>

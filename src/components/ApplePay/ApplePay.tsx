@@ -3,7 +3,7 @@ import { PaymentRequestButtonElement, useStripe, useElements } from '@stripe/rea
 import { useNavigate } from 'react-router-dom';
 import { ApplePayProps } from './types';
 
-const ApplePay: React.FC<ApplePayProps> = ({ imageIds, onClose, amount, albumName }) => {
+const ApplePay: React.FC<ApplePayProps> = ({ imageIds, onClose, amount, albumName, isAlbumPurchased }) => {
   const stripe = useStripe();
   const elements = useElements();
   const [paymentRequest, setPaymentRequest] = useState<any>(null);
@@ -83,7 +83,8 @@ const ApplePay: React.FC<ApplePayProps> = ({ imageIds, onClose, amount, albumNam
           onClose();
           navigate('/success', {
             state: {
-              albumName: albumName, 
+              albumName: albumName,
+              isAlbumPurchased: isAlbumPurchased,
               purchasedPhotos: imageIds, 
               totalPhotosInAlbum: imageIds.length, 
             }
