@@ -22,9 +22,10 @@ export interface PayPopupProps {
     onClose: () => void;
     imageIds: number[];
     showAllPhotosOnly?: boolean; 
+    albumName: string;
 };
 
-const PayPopup: React.FC<PayPopupProps> = ({ onClose, imageIds, showAllPhotosOnly = false }) => {
+const PayPopup: React.FC<PayPopupProps> = ({ onClose, imageIds, showAllPhotosOnly = false, albumName }) => {
     const [selectedOption, setSelectedOption] = useState<'photos' | 'photo' | null>(null);
     const [allImageIds, setAllImageIds] = useState<number[]>([]);
     const [unpaidPhotoCount, setUnpaidPhotoCount] = useState(0); 
@@ -116,9 +117,13 @@ const PayPopup: React.FC<PayPopupProps> = ({ onClose, imageIds, showAllPhotosOnl
     };
     
     const isAlbumDetailsPage = location.pathname.startsWith('/albumDetails') && decodedAlbumId;
+    const handleCloseClick = () => {
+        onClose();
+        document.body.style.overflow = 'auto'; 
+    };
 
     return (
-        <FocusTrap>
+        <FocusTrap active={true}>
             <PayPopupContainer>
                 <InnerContainer>
                     <CloseIcon onClick={onClose} tabIndex={0} />
@@ -134,9 +139,9 @@ const PayPopup: React.FC<PayPopupProps> = ({ onClose, imageIds, showAllPhotosOnl
                                 id="photos" 
                                 checked={selectedOption === 'photos'} 
                                 readOnly
-                                tabIndex={0}
+                                tabIndex={1}
                             />
-                            <Label htmlFor="photos" tabIndex={0}>
+                            <Label htmlFor="photos" tabIndex={-1}>
                                 <span>All {unpaidPhotoCount} photos from {decodedAlbumId}</span> 
                                 <span>${totalPrice / 100}</span>
                             </Label>
@@ -150,9 +155,9 @@ const PayPopup: React.FC<PayPopupProps> = ({ onClose, imageIds, showAllPhotosOnl
                                     id="photo" 
                                     checked={selectedOption === 'photo'} 
                                     onChange={() => setSelectedOption('photo')}
-                                    tabIndex={0}
+                                    tabIndex={2}
                                 />
-                                <Label htmlFor="photo" tabIndex={0}>
+                                <Label htmlFor="photo" tabIndex={-1}>
                                     <span>Current Photo</span>
                                     <span>${pricePerPhoto / 100}</span>
                                 </Label>
@@ -165,9 +170,9 @@ const PayPopup: React.FC<PayPopupProps> = ({ onClose, imageIds, showAllPhotosOnl
                                         id="photos" 
                                         checked={selectedOption === 'photos'} 
                                         onChange={() => setSelectedOption('photos')}
-                                        tabIndex={0}
+                                        tabIndex={3}
                                     />
-                                    <Label htmlFor="photos" tabIndex={0}>
+                                    <Label htmlFor="photos" tabIndex={-1}>
                                         <span>All {unpaidPhotoCount} photos from {decodedAlbumId}</span> 
                                         <span>${totalPrice / 100}</span>
                                     </Label>
@@ -179,11 +184,12 @@ const PayPopup: React.FC<PayPopupProps> = ({ onClose, imageIds, showAllPhotosOnl
                         imageIds={selectedOption === 'photos' ? allImageIds : [singleImageId].filter((id): id is number => id !== null)}
                         onClose={onClose}
                         amount={selectedOption === 'photos' ? totalPrice : pricePerPhoto}
+                        albumName={albumName}
                     />
 
                     <ButtonContainer>
-                        <Button onClick={() => handleCheckout('card')} tabIndex={1}>Checkout</Button>
-                        <ButtonPayPal onClick={() => handleCheckout('paypal')} tabIndex={1}>
+                        <Button onClick={() => handleCheckout('card')} tabIndex={4}>Checkout</Button>
+                        <ButtonPayPal onClick={() => handleCheckout('paypal')} tabIndex={5}>
                             <img src={payPal} alt="PayPal" />
                         </ButtonPayPal>
                     </ButtonContainer>

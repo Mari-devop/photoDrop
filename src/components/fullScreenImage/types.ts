@@ -5,4 +5,5 @@ export interface FullscreenImageProps {
     onClose: () => void;
     isMobile: boolean;
     date: string; 
+    albumName: string;
 }

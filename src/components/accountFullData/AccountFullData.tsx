@@ -133,10 +133,10 @@ const AccountFullData: React.FC<AccountFullDataProps> = ({ imagesData }) => {
   useEffect(() => {
     const timeouts = [
       setTimeout(() => setAnimationStep(1), 0), 
-      setTimeout(() => setAnimationStep(2), 500), 
-      setTimeout(() => setAnimationStep(3), 1000), 
-      setTimeout(() => setAnimationStep(4), 1500), 
-      setTimeout(() => setAnimationStep(5), 2000),
+      setTimeout(() => setAnimationStep(2), 250),  
+      setTimeout(() => setAnimationStep(3), 500), 
+      setTimeout(() => setAnimationStep(4), 750), 
+      setTimeout(() => setAnimationStep(5), 1000),
     ];
 
     return () => {
@@ -145,7 +145,7 @@ const AccountFullData: React.FC<AccountFullDataProps> = ({ imagesData }) => {
   }, []);
 
   useEffect(() => {
-    const intervalId = setInterval(loadNextPhoto, 500);
+    const intervalId = setInterval(loadNextPhoto, 250);
     return () => clearInterval(intervalId);
   }, [albums]);
 
@@ -240,6 +240,7 @@ const AccountFullData: React.FC<AccountFullDataProps> = ({ imagesData }) => {
             onClose={handleCloseFullscreen}
             isMobile={isMobile}
             date={selectedImage.date}
+            albumName={albums.find(album => album.images.includes(selectedImage))?.locationName || ''}
           />
         )}
       </Container>

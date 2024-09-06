@@ -1,5 +1,4 @@
 import React, { useEffect, useState, useRef } from 'react';
-import FocusTrap from 'focus-trap-react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { arrayBufferToBase64 } from '../../utils/ConverFunc';
@@ -12,7 +11,7 @@ import { ThreeCircles } from 'react-loader-spinner';
 import { LoadMoreButton } from '../accountFullData/AccountFullData.styled';
 
 const AlbumDetails: React.FC = () => {
-  const { albumId: locationName } = useParams<{ albumId: string }>(); 
+  const { albumId: locationName = '' } = useParams<{ albumId: string }>(); 
   const [images, setImages] = useState<Array<Image>>([]);
   const [loadingImages, setLoadingImages] = useState<boolean[]>([]); 
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -52,17 +51,21 @@ const AlbumDetails: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    if (showPayPopup) {
-      document.body.style.overflow = 'hidden'; 
-    } else {
-      document.body.style.overflow = 'auto'; 
-    }
-
+    const manageBodyScroll = () => {
+      if (showPayPopup) {
+        document.body.style.overflow = 'hidden';
+      } else {
+        document.body.style.overflow = 'auto';
+      }
+    };
+  
+    manageBodyScroll();
+  
     return () => {
-      document.body.style.overflow = 'auto'; 
+      document.body.style.overflow = 'auto';  
     };
   }, [showPayPopup]);
-
+  
   const loadPhotos = async () => {
     try {
       const token = localStorage.getItem('authToken');
@@ -170,7 +173,6 @@ const AlbumDetails: React.FC = () => {
   }
 
   return (
-    <FocusTrap active={focusEnabled}>
       <Container>
         <PhotoGrid>
           {images.slice(0, displayedImages).map((image, index) => (
@@ -180,7 +182,6 @@ const AlbumDetails: React.FC = () => {
                 border: loadingImages[index] ? '0.3px solid var(--button-hover-color)' : 'none',
                 backgroundColor: loadingImages[index] ? 'rgba(51, 0, 204, 0.05)' : 'transparent',
               }}
-              tabIndex={index + 1}
             >
               {loadingImages[index] ? (
                 <SpinnerWrapper>
@@ -195,7 +196,7 @@ const AlbumDetails: React.FC = () => {
               ) : (
                 <img
                   src={image.binaryString}
-                  alt="Photo"
+                  alt="Photoо"
                   onClick={() => handleImageClick(image)}
                   className="fade-in"
                   style={{
@@ -214,7 +215,6 @@ const AlbumDetails: React.FC = () => {
         )}
         {!images.every(image => image.isPurchased) && (
           <Button 
-            tabIndex={images.length + 1}  
             onClick={handleUnlockPhotosClick}
           >
             Unlock your photos
@@ -229,6 +229,7 @@ const AlbumDetails: React.FC = () => {
             onClose={handleCloseFullscreen}
             isMobile={isMobile}
             date={selectedImage.date}  
+            albumName={locationName} 
           />
         )}
         {showPayPopup && (
@@ -236,10 +237,10 @@ const AlbumDetails: React.FC = () => {
             onClose={handlePayPopupClose}
             imageIds={images.filter(image => !image.isPurchased).map(image => image.id)}
             showAllPhotosOnly={true}
+            albumName={locationName}
           />
         )}
       </Container>
-    </FocusTrap>
   );
 };
 

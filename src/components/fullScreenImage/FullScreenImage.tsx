@@ -26,7 +26,7 @@ const arrayBufferToBase64 = (buffer: ArrayBuffer): string => {
     return window.btoa(binary);
 };
 
-const FullscreenImage: React.FC<FullscreenImageProps> = ({ imageSrc, isPurchased, imageId, onClose, isMobile, date }) => {
+const FullscreenImage: React.FC<FullscreenImageProps> = ({ imageSrc, isPurchased, imageId, onClose, isMobile, date, albumName }) => {
     const [showPayPopup, setShowPayPopup] = useState(false);
     const [showSharePopup, setShowSharePopup] = useState(false); 
     const [highQualitySrc, setHighQualitySrc] = useState<string | null>(null);
@@ -184,6 +184,7 @@ const FullscreenImage: React.FC<FullscreenImageProps> = ({ imageSrc, isPurchased
                         <PayPopup 
                             onClose={togglePayPopup} 
                             imageIds={[Number(imageId)]}   
+                            albumName={albumName}
                         />
                     </FocusTrap>
                 )}

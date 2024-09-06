@@ -72,6 +72,7 @@ const AccountEmpty = () => {
           onClose={handleCloseFullscreen}
           isMobile={isMobile}
           date={new Date().toString()}  
+          albumName="Artist Prints"
         />
       )}
     </div>

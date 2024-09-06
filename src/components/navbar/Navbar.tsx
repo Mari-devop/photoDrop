@@ -138,7 +138,7 @@ const Navbar = () => {
       {location.pathname === '/nameedit' && (
         <ArrowContainer>
           <Link to="/accountsettings">
-            <Arrow src={arrow} alt="arrow" />
+            <Arrow src={arrow} alt="arrow" tabIndex={1} />
           </Link>
         </ArrowContainer>
       )}
@@ -150,9 +150,9 @@ const Navbar = () => {
         </ArrowContainer>
       )}
       {!isAlbumDetailsPage && (
-         <Link to="/account">
+        <Link to="/account">
           <img src={logo} alt="logo" />
-       </Link>
+        </Link>
       )}
      {location.pathname === '/account' && (
         <SelfieContainer>
@@ -188,6 +188,7 @@ const Navbar = () => {
           onClose={handleClosePayPopup}
           imageIds={[]} 
           showAllPhotosOnly={true} 
+          albumName={albumId} 
         />
       )}
     </NavbarContainer>
