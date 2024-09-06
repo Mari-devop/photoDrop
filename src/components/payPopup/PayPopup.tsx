@@ -28,6 +28,7 @@ const PayPopup: React.FC<PayPopupProps> = ({ onClose, imageIds, showAllPhotosOnl
     const [selectedOption, setSelectedOption] = useState<'photos' | 'photo' | null>(null);
     const [allImageIds, setAllImageIds] = useState<number[]>([]);
     const [unpaidPhotoCount, setUnpaidPhotoCount] = useState(0); 
+    const [isAlbumPurchased, setIsAlbumPurchased] = useState(false);
     const [singleImageId, setSingleImageId] = useState<number | null>(null);
     const navigate = useNavigate();
     const location = useLocation();
@@ -52,7 +53,13 @@ const PayPopup: React.FC<PayPopupProps> = ({ onClose, imageIds, showAllPhotosOnl
                     const unpurchasedImageIds = albumData.images
                         .filter((image: any) => !image.isPurchased)
                         .map((image: any) => image.id);
-                    
+
+                    const purchasedImageIds = albumData.images
+                        .filter((image: any) => image.isPurchased);
+
+                    if ((purchasedImageIds.length + imageIds.length) === albumData.images.length) {
+                        setIsAlbumPurchased(true);
+                    }    
                     if (unpurchasedImageIds.length > 0) {
                         setAllImageIds(unpurchasedImageIds);
                         setUnpaidPhotoCount(unpurchasedImageIds.length); 
@@ -179,6 +186,7 @@ const PayPopup: React.FC<PayPopupProps> = ({ onClose, imageIds, showAllPhotosOnl
                         imageIds={selectedOption === 'photos' ? allImageIds : [singleImageId].filter((id): id is number => id !== null)}
                         onClose={onClose}
                         amount={selectedOption === 'photos' ? totalPrice : pricePerPhoto}
+                        isAlbumPurchased={isAlbumPurchased} 
                     />
 
                     <ButtonContainer>
