@@ -11,20 +11,20 @@ interface Photo {
 const ThankU = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { albumName, purchasedPhotos, totalPhotosInAlbum } = location.state || {};
+  const {albumName, purchasedPhotos, totalPhotosInAlbum, isAlbumPurchased } = location.state || {};
 
   const handleButtonClick = () => {
     navigate('/account');
   };
 
-  const isFullAlbumPurchased = purchasedPhotos?.length === totalPhotosInAlbum;
+  //const isFullAlbumPurchased = purchasedPhotos?.length === totalPhotosInAlbum;
 
   return (
     <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
       <Container>
         <Title>Thank you</Title>
 
-        {isFullAlbumPurchased ? (
+        {isAlbumPurchased ? (
           <Subtitle>The album <span>{albumName}</span> is now unlocked.</Subtitle>
         ) : (
           <Subtitle>Your photo is now unlocked.</Subtitle>
