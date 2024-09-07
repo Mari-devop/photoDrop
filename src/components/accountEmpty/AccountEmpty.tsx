@@ -69,7 +69,7 @@ const AccountEmpty = () => {
         // @ts-ignore
           imageSrc={selectedImage} 
           isPurchased={true}  
-          imageId={selectedImage} 
+          imageId={1} 
           onClose={handleCloseFullscreen}
           isMobile={isMobile}
           date={new Date().toString()}  

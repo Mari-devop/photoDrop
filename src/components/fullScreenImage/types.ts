@@ -1,13 +1,12 @@
-import { Image } from "../accountFullData/types";
-
 export interface FullscreenImageProps {
-    imageSrc: Image;
+    imageSrc: { binaryString: string };
     isPurchased: boolean;
-    imageId: string;
+    imageId: number;
+    albumImages?: { id: string | number; binaryString: string }[]; 
     onClose: () => void;
     isMobile: boolean;
-    date: string; 
-    isHighQuality?: boolean;
+    date: string;
+    isHighQuality: boolean;
     albumName: string;
     imagesIdsToBuy?: number[];
 }

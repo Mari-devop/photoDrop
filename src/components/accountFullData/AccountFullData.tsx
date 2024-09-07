@@ -241,7 +241,7 @@ const AccountFullData: React.FC<AccountFullDataProps> = ({ imagesData }) => {
           <FullscreenImage
             imageSrc={selectedImage}
             isPurchased={selectedImage.isPurchased}
-            imageId={selectedImage.id.toString()}
+            imageId={Number(selectedImage.id)}
             onClose={handleCloseFullscreen}
             isMobile={isMobile}
             date={selectedImage.date}

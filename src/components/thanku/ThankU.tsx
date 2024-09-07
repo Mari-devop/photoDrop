@@ -15,13 +15,14 @@ const ThankU = () => {
     navigate('/account');
   };
 
+  const isFullAlbumPurchased = isAlbumPurchased || (purchasedPhotos.length === totalPhotosInAlbum && totalPhotosInAlbum > 0);
 
   return (
     <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
       <Container>
         <Title>Thank you</Title>
 
-        {isAlbumPurchased ? (  
+        {isFullAlbumPurchased ? (  
           <Subtitle>The album1 <span>{albumName}</span> is now unlocked.</Subtitle>
         ) : (album !== 'null' && album !== undefined && album !== null) ? (
           <Subtitle>The album2 <span>{album}</span> is now unlocked.</Subtitle>

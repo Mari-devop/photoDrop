@@ -26,10 +26,11 @@ const arrayBufferToBase64 = (buffer: ArrayBuffer): string => {
     return window.btoa(binary);
 };
 
-const FullscreenImage: React.FC<FullscreenImageProps> = ({ imageSrc: selectedImage, imagesIdsToBuy, isPurchased, imageId, onClose, isMobile, date, isHighQuality, albumName  }) => {
+const FullscreenImage: React.FC<FullscreenImageProps> = ({ imageSrc: selectedImage, isPurchased, imageId, albumImages, onClose, isMobile, date, isHighQuality, albumName  }) => {
     const [showPayPopup, setShowPayPopup] = useState(false);
     const [showSharePopup, setShowSharePopup] = useState(false); 
     const [isLoading, setIsLoading] = useState<boolean>(false); 
+    const [isUnlockingAlbum, setIsUnlockingAlbum] = useState(false);
     const imgRef = useRef<HTMLImageElement>(null);
 
     useEffect(() => {
@@ -138,6 +139,15 @@ const FullscreenImage: React.FC<FullscreenImageProps> = ({ imageSrc: selectedIma
         }
     };
     
+    const handleUnlockPhoto = () => {
+        setIsUnlockingAlbum(false);
+        setShowPayPopup(true);  // Open PayPopup for a single photo
+    };
+
+    const handleUnlockAlbum = () => {
+        setIsUnlockingAlbum(true);
+        setShowPayPopup(true);  // Open PayPopup for the entire album
+    };
 
     return (
         <FocusTrap>
@@ -179,17 +189,27 @@ const FullscreenImage: React.FC<FullscreenImageProps> = ({ imageSrc: selectedIma
                             <SeeInFrameButton>See in Frame</SeeInFrameButton>
                         </>
                     ) : (
-                        <UnlockButton onClick={togglePayPopup} >Unlock photo</UnlockButton>
+                        <>
+                        <UnlockButton onClick={handleUnlockPhoto}>Unlock photo</UnlockButton>
+                        {albumImages && (
+                            <UnlockButton onClick={handleUnlockAlbum}>Unlock entire album</UnlockButton>
+                        )}
+                    </>
                     )}
                 </div>
                
                 {showPayPopup && (
-                        <PayPopup 
-                            onClose={togglePayPopup} 
-                            imageIds={imagesIdsToBuy!}   
-                            albumName={albumName}                
-                        />
+                    <PayPopup 
+                        onClose={() => setShowPayPopup(false)} 
+                        imageIds={isUnlockingAlbum 
+                            ? (albumImages?.map((img) => Number(img.id)) || [])  // Ensure all ids are cast to numbers
+                            : [imageId]}  // Single image case 
+                        albumName={albumName}                
+                    />
                 )}
+
+
+
                 {showSharePopup && (
                     <SharePopup 
                         selectedImage={{ 

@@ -236,7 +236,7 @@ const AlbumDetails: React.FC = () => {
           <FullscreenImage 
             imageSrc={selectedImage} 
             isPurchased={selectedImage.isPurchased}
-            imageId={selectedImage.id.toString()}
+            imageId={selectedImage.id} 
             imagesIdsToBuy={images.filter(image => !image.isPurchased).map(image => image.id)}
             onClose={handleCloseFullscreen}
             isMobile={isMobile}
