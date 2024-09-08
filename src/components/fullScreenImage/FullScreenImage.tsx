@@ -140,7 +140,6 @@ const FullscreenImage: React.FC<FullscreenImageProps> = ({ imageSrc: selectedIma
     };
     
     const handleUnlockPhoto = () => {
-        setIsUnlockingAlbum(false);
         setShowPayPopup(true);  
     };
 
@@ -190,24 +189,22 @@ const FullscreenImage: React.FC<FullscreenImageProps> = ({ imageSrc: selectedIma
                         </>
                     ) : (
                         <>
-                        <UnlockButton onClick={handleUnlockPhoto}>Unlock photo</UnlockButton>
-                        {albumImages && (
-                            <UnlockButton onClick={handleUnlockAlbum}>Unlock entire album</UnlockButton>
-                        )}
-                    </>
+                            <UnlockButton onClick={handleUnlockPhoto}>Unlock photo</UnlockButton>
+                            {albumImages && (
+                                <UnlockButton onClick={handleUnlockAlbum}>Unlock entire album</UnlockButton>
+                            )}
+                         </>
                     )}
                 </div>
                
                 {showPayPopup && (
                     <PayPopup 
                         onClose={() => setShowPayPopup(false)} 
-                        imageIds={isUnlockingAlbum 
-                            ? (albumImages?.map((img) => Number(img.id)) || []) 
-                            : [imageId]} 
+                        imageIds={albumImages?.map((image) => Number(image.id))!} 
+                        selectedImageId={imageId}
                         albumName={albumName}                
                     />
                 )}
-
 
 
                 {showSharePopup && (

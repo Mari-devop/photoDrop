@@ -23,9 +23,10 @@ export interface PayPopupProps {
     imageIds: number[];
     showAllPhotosOnly?: boolean; 
     albumName: string;
+    selectedImageId?: number;
 };
 
-const PayPopup: React.FC<PayPopupProps> = ({ onClose, imageIds, showAllPhotosOnly = false, albumName }) => {
+const PayPopup: React.FC<PayPopupProps> = ({ onClose, imageIds, showAllPhotosOnly = false, albumName, selectedImageId }) => {
     const [selectedOption, setSelectedOption] = useState<'photos' | 'photo' | null>(null);
     const [allImageIds, setAllImageIds] = useState<number[]>([]);
     const [unpaidPhotoCount, setUnpaidPhotoCount] = useState(0); 
@@ -57,11 +58,14 @@ const PayPopup: React.FC<PayPopupProps> = ({ onClose, imageIds, showAllPhotosOnl
                     
                     const purchasedImageIds = albumData.images
                          .filter((image: any) => image.isPurchased);
+                
                     
-
-                    if ((purchasedImageIds.length + imageIds.length) === albumData.images.length) {
+                    const imagesToBuy = (selectedOption === 'photos') ? imageIds : [singleImageId].filter((id): id is number => id !== null);
+                    
+                    if ((purchasedImageIds.length + imagesToBuy.length) === albumData.images.length) {
                          setIsAlbumPurchased(true);
                     } 
+
                     if (unpurchasedImageIds.length > 0) {
                         setAllImageIds(unpurchasedImageIds);
                         setUnpaidPhotoCount(unpurchasedImageIds.length); 
@@ -81,9 +85,9 @@ const PayPopup: React.FC<PayPopupProps> = ({ onClose, imageIds, showAllPhotosOnl
     useEffect(() => {
         if (showAllPhotosOnly) {
             setSelectedOption('photos');
-        } else if (imageIds.length === 1) {
+        } else if (!selectedOption || selectedOption === 'photo') {
             setSelectedOption('photo');
-            setSingleImageId(imageIds[0]);
+            setSingleImageId(selectedImageId!);
         } else {
             setSelectedOption('photos');
         }
@@ -131,52 +135,50 @@ const PayPopup: React.FC<PayPopupProps> = ({ onClose, imageIds, showAllPhotosOnl
             <PayPopupContainer>
                 <InnerContainer>
                     <CloseIcon onClick={onClose} tabIndex={0} />
-                    <Title tabIndex={1}>Unlock your photos</Title>
-                    <Text tabIndex={2}>
+                    <Title tabIndex={-1}>Unlock your photos</Title>
+                    <Text tabIndex={-1}>
                         Download, view, and share your photos in hi-resolution with no watermark.
                     </Text>
                     {showAllPhotosOnly ? (
-                        <Row>
+                        <Row tabIndex={1}>
                             <Input 
                                 type="radio" 
                                 name="photoOption" 
                                 id="photos" 
                                 checked={selectedOption === 'photos'} 
                                 readOnly
-                                tabIndex={3}
                             />
-                            <Label htmlFor="photos" tabIndex={-1}>
+                            <Label htmlFor="photos">
                                 <span>All {unpaidPhotoCount} photos from {decodedAlbumId}</span> 
                                 <span>${totalPrice / 100}</span>
                             </Label>
                         </Row>
                     ) : (
                         <>
-                            <Row>
+                            <Row tabIndex={2}>
                                 <Input 
                                     type="radio" 
                                     name="photoOption" 
                                     id="photo" 
                                     checked={selectedOption === 'photo'} 
                                     onChange={() => setSelectedOption('photo')}
-                                    tabIndex={4}
+
                                 />
-                                <Label htmlFor="photo" tabIndex={-1}>
+                                <Label htmlFor="photo">
                                     <span>Current Photo</span>
                                     <span>${pricePerPhoto / 100}</span>
                                 </Label>
                             </Row>
                             {isAlbumDetailsPage && (
-                                <Row>
+                                <Row tabIndex={4}>
                                     <Input 
                                         type="radio" 
                                         name="photoOption" 
                                         id="photos" 
                                         checked={selectedOption === 'photos'} 
                                         onChange={() => setSelectedOption('photos')}
-                                        tabIndex={5}
                                     />
-                                    <Label htmlFor="photos" tabIndex={-1}>
+                                    <Label htmlFor="photos">
                                         <span>All {unpaidPhotoCount} photos from {decodedAlbumId}</span> 
                                         <span>${totalPrice / 100}</span>
                                     </Label>

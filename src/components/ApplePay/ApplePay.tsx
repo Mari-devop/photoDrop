@@ -34,17 +34,21 @@ const ApplePay: React.FC<ApplePayProps> = ({ imageIds, onClose, amount, albumNam
       requestPayerName: true,
       requestPayerEmail: true,
     });
+    console.log( `new payment request created for ImageIds: ${imageIds}, amount: ${amount}, albumName: ${albumName}`);
+    
+    
+      pr.canMakePayment().then((result) => {
+        if (result) {
+          console.log('Apple Pay is available.');
+          setPaymentRequest(pr);
+          console.log(`transmited ImageIds: ${imageIds}, amount: ${amount}, albumName: ${albumName}`);
+        } else {
+          console.error('Apple Pay is not available.');
+        }
+      });
+    
 
-    pr.canMakePayment().then((result) => {
-      if (result) {
-        console.log('Apple Pay is available.');
-        setPaymentRequest(pr);
-      } else {
-        console.error('Apple Pay is not available.');
-      }
-    });
-
-    pr.on('paymentmethod', async (e) => {
+    pr.on('paymentmethod', async (e:any) => {
       try {
         const response = await fetch('https://photodrop-dawn-surf-6942.fly.dev/client/payment', {
           method: 'POST',
@@ -53,13 +57,16 @@ const ApplePay: React.FC<ApplePayProps> = ({ imageIds, onClose, amount, albumNam
             'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
           },
           body: JSON.stringify({
-            imageIds, 
+            imageIds: localStorage.getItem('imageIds'), 
             paymentMethod: 'apple-pay',
             currency: 'usd',
             amount: amount, 
           }),
         });
 
+
+        console.log(`imageIds from lS: ${localStorage.getItem('imageIds')}`);
+  
         const data = await response.json();
         console.log("Received data from server:", data);
 
@@ -84,7 +91,7 @@ const ApplePay: React.FC<ApplePayProps> = ({ imageIds, onClose, amount, albumNam
           navigate('/success', {
             state: {
               albumName: albumName,
-              isAlbumPurchased: imageIds.length > 1,
+              isAlbumPurchased: isAlbumPurchased,
               purchasedPhotos: imageIds, 
               totalPhotosInAlbum: imageIds.length, 
             }
@@ -107,6 +114,9 @@ const ApplePay: React.FC<ApplePayProps> = ({ imageIds, onClose, amount, albumNam
           amount: amount,
         },
       });
+     
+      localStorage.setItem('imageIds', JSON.stringify(imageIds));
+      console.log(`updated ImageIds: ${imageIds}, amount: ${amount}, albumName: ${albumName}`);
     }
   }, [amount, paymentRequest]);
 
