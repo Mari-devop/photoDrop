@@ -32,6 +32,7 @@ const FullscreenImage: React.FC<FullscreenImageProps> = ({ imageSrc: selectedIma
     const [isLoading, setIsLoading] = useState<boolean>(false); 
     const [isUnlockingAlbum, setIsUnlockingAlbum] = useState(false);
     const imgRef = useRef<HTMLImageElement>(null);
+    const [focusEnabled, setFocusEnabled] = useState(false);
 
     useEffect(() => {
         document.body.style.overflow = 'hidden';
@@ -45,6 +46,9 @@ const FullscreenImage: React.FC<FullscreenImageProps> = ({ imageSrc: selectedIma
         const handleKeyDown = (event: KeyboardEvent) => {
             if (event.key === 'Escape') {
                 onClose();
+            }
+            if (event.key === 'Tab' && !showPayPopup) {
+                setFocusEnabled(true); 
             }
         };
 
@@ -149,7 +153,7 @@ const FullscreenImage: React.FC<FullscreenImageProps> = ({ imageSrc: selectedIma
     };
 
     return (
-        <FocusTrap>
+        <FocusTrap active={focusEnabled && !showPayPopup}>
             <FullscreenContainer>
               
                 <CloseButton onClick={onClose}>×</CloseButton>
