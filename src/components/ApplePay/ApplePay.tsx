@@ -84,7 +84,7 @@ const ApplePay: React.FC<ApplePayProps> = ({ imageIds, onClose, amount, albumNam
           navigate('/success', {
             state: {
               albumName: albumName,
-              isAlbumPurchased: isAlbumPurchased,
+              isAlbumPurchased: imageIds.length > 1,
               purchasedPhotos: imageIds, 
               totalPhotosInAlbum: imageIds.length, 
             }

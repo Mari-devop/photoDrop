@@ -141,12 +141,12 @@ const FullscreenImage: React.FC<FullscreenImageProps> = ({ imageSrc: selectedIma
     
     const handleUnlockPhoto = () => {
         setIsUnlockingAlbum(false);
-        setShowPayPopup(true);  // Open PayPopup for a single photo
+        setShowPayPopup(true);  
     };
 
     const handleUnlockAlbum = () => {
         setIsUnlockingAlbum(true);
-        setShowPayPopup(true);  // Open PayPopup for the entire album
+        setShowPayPopup(true); 
     };
 
     return (
@@ -202,8 +202,8 @@ const FullscreenImage: React.FC<FullscreenImageProps> = ({ imageSrc: selectedIma
                     <PayPopup 
                         onClose={() => setShowPayPopup(false)} 
                         imageIds={isUnlockingAlbum 
-                            ? (albumImages?.map((img) => Number(img.id)) || [])  // Ensure all ids are cast to numbers
-                            : [imageId]}  // Single image case 
+                            ? (albumImages?.map((img) => Number(img.id)) || []) 
+                            : [imageId]} 
                         albumName={albumName}                
                     />
                 )}

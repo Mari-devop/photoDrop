@@ -159,7 +159,7 @@ const AlbumDetails: React.FC = () => {
   const handleUnlockPhotosClick = () => {
     const unpaidImages = images.filter(image => !image.isPurchased);
     if (unpaidImages.length > 0) {
-      setShowPayPopup(true);
+      setShowPayPopup(true); 
     } else {
       alert("No photos available for purchase.");
     }
@@ -245,6 +245,7 @@ const AlbumDetails: React.FC = () => {
             isHighQuality={isHighQualityImage}  
           />
         )}
+
         {showPayPopup && (
           <PayPopup 
             onClose={handlePayPopupClose}
