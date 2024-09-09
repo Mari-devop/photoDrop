@@ -22,6 +22,7 @@ const AccountEmpty = () => {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [isMobile, setIsMobile] = useState<boolean>(window.innerWidth < 500);
+  const [imageSrc, setImageSrc] = useState<{ 'binaryString': string }| null>(null);
 
   useEffect(() => {
     const token = localStorage.getItem('authToken');
@@ -39,6 +40,7 @@ const AccountEmpty = () => {
 
   const handleImageClick = (image: string) => {
     setSelectedImage(image);
+    setImageSrc({ 'binaryString': image });
     setIsFullscreen(true);
   };
   
@@ -66,8 +68,8 @@ const AccountEmpty = () => {
   
       {isFullscreen && selectedImage && (
         <FullscreenImage 
-        // @ts-ignore
-          imageSrc={selectedImage} 
+          isHighQuality={false}
+          imageSrc={ imageSrc! } 
           isPurchased={true}  
           imageId={1} 
           onClose={handleCloseFullscreen}
