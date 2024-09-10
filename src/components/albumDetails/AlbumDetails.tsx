@@ -66,6 +66,12 @@ const AlbumDetails: React.FC = () => {
       document.body.style.overflow = 'auto';  
     };
   }, [showPayPopup]);
+
+  const saveUnpaidImagesToLocalStorage = (unpaidImages: myImage[]) => {
+    const unpaidImageIds = unpaidImages.map(image => image.id);
+    localStorage.setItem('unpaidImages', JSON.stringify(unpaidImageIds));
+  };
+
   
   const loadPhotos = async () => {
     try {
@@ -90,6 +96,10 @@ const AlbumDetails: React.FC = () => {
 
           setImages(loadedImages);
           setLoadingImages(new Array(loadedImages.length).fill(true)); 
+
+          const unpaidImages = loadedImages.filter((image: myImage) => !image.isPurchased);
+
+          saveUnpaidImagesToLocalStorage(unpaidImages);
 
           navigate(`/albumDetails/${locationName}?photos=${selectedAlbum.images.length}&date=${selectedAlbum.images[0].date}`, { replace: true });
 
@@ -156,14 +166,16 @@ const AlbumDetails: React.FC = () => {
     setSelectedImage(null);
   };
 
+
   const handleUnlockPhotosClick = () => {
-    const unpaidImages = images.filter(image => !image.isPurchased);
+    const unpaidImages = JSON.parse(localStorage.getItem('unpaidImages') || '[]');
     if (unpaidImages.length > 0) {
       setShowPayPopup(true); 
     } else {
       alert("No photos available for purchase.");
     }
-  };
+};
+
 
   const handlePayPopupClose = () => {
     setShowPayPopup(false);
@@ -249,7 +261,7 @@ const AlbumDetails: React.FC = () => {
         {showPayPopup && (
           <PayPopup 
             onClose={handlePayPopupClose}
-            imageIds={images.filter(image => !image.isPurchased).map(image => image.id)}
+            imageIds={JSON.parse(localStorage.getItem('unpaidImages') || '[]')} 
             showAllPhotosOnly={true}
             albumName={locationName}
           />

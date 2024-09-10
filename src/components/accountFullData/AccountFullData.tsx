@@ -219,7 +219,6 @@ const AccountFullData: React.FC<AccountFullDataProps> = ({ imagesData }) => {
                     src={image.binaryString}
                     alt={`Im ${image.id}`}
                     ref={(el) => (photoRefs.current[idx] = el!)}
-
                     onClick={() => handleImageClick(image)}
                   />
                 )}

@@ -1,3 +1,5 @@
+
+
 export interface PayPopupProps {
     onClose: () => void;
     imageIds: number[];

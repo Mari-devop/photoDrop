@@ -7,6 +7,7 @@ const ApplePay: React.FC<ApplePayProps> = ({ imageIds, onClose, amount, albumNam
   const stripe = useStripe();
   const elements = useElements();
   const [paymentRequest, setPaymentRequest] = useState<any>(null);
+  const [isButtonVisible, setIsButtonVisible] = useState(false); 
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -41,7 +42,7 @@ const ApplePay: React.FC<ApplePayProps> = ({ imageIds, onClose, amount, albumNam
         if (result) {
           console.log('Apple Pay is available.');
           setPaymentRequest(pr);
-          console.log(`transmited ImageIds: ${imageIds}, amount: ${amount}, albumName: ${albumName}`);
+          setIsButtonVisible(true);
         } else {
           console.error('Apple Pay is not available.');
         }
@@ -120,22 +121,27 @@ const ApplePay: React.FC<ApplePayProps> = ({ imageIds, onClose, amount, albumNam
     }
   }, [amount, paymentRequest]);
 
-  return paymentRequest ? (
-    <div className='custom-apple-pay-button'>
-      <PaymentRequestButtonElement 
-        options={{ 
-          paymentRequest,
-          style: {
-            paymentRequestButton: {
-              type: 'default', 
-              theme: 'dark', 
-              height: '48px', 
-            },
-          },
-        }} 
-      />
+  return (
+    <div className='custom-apple-pay-wrapper'>
+      <div className="button-placeholder" />
+      {paymentRequest && (
+        <div className={`custom-apple-pay-button ${isButtonVisible ? 'visible' : 'hidden'}`}>
+          <PaymentRequestButtonElement
+            options={{
+              paymentRequest,
+              style: {
+                paymentRequestButton: {
+                  type: 'default',
+                  theme: 'dark',
+                  height: '48px',
+                },
+              },
+            }}
+          />
+        </div>
+      )}
     </div>
-  ) : null;
-};
+  );
 
+}
 export default ApplePay;

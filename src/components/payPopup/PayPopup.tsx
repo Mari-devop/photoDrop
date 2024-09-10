@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import FocusTrap from 'focus-trap-react';
 import axios from 'axios';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -37,6 +37,15 @@ const PayPopup: React.FC<PayPopupProps> = ({ onClose, imageIds, showAllPhotosOnl
     const decodedAlbumId = decodeURIComponent(location.pathname.split("/").pop() || "");
     const pricePerPhoto = 100; 
     const totalPrice = pricePerPhoto * unpaidPhotoCount;
+    const popupRef = useRef<HTMLDivElement>(null); 
+
+    useEffect(() => {
+        const unpaidImagesFromStorage = JSON.parse(localStorage.getItem('unpaidImages') || '[]');
+        if (unpaidImagesFromStorage.length > 0) {
+            setAllImageIds(unpaidImagesFromStorage);
+            setUnpaidPhotoCount(unpaidImagesFromStorage.length);
+        }
+    }, []);
 
     useEffect(() => {
         const token = localStorage.getItem('authToken');
@@ -130,10 +139,24 @@ const PayPopup: React.FC<PayPopupProps> = ({ onClose, imageIds, showAllPhotosOnl
     
     const isAlbumDetailsPage = location.pathname.startsWith('/albumDetails') && decodedAlbumId;
 
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (popupRef.current && !popupRef.current.contains(event.target as Node)) {
+                onClose(); 
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, [onClose]);
+
     return (
         <FocusTrap>
             <PayPopupContainer>
-                <InnerContainer>
+                <InnerContainer ref={popupRef}>
                     <CloseIcon onClick={onClose} tabIndex={0} />
                     <Title tabIndex={-1}>Unlock your photos</Title>
                     <Text tabIndex={-1}>

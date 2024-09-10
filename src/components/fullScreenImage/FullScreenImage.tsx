@@ -152,78 +152,88 @@ const FullscreenImage: React.FC<FullscreenImageProps> = ({ imageSrc: selectedIma
         setShowPayPopup(true); 
     };
 
+    const handleOverlayClick = (e: React.MouseEvent) => {
+        if (e.target === e.currentTarget) {
+            onClose(); 
+        }
+    };
+
     return (
         <FocusTrap active={focusEnabled && !showPayPopup}>
-            <FullscreenContainer>
-              
-                <CloseButton onClick={onClose}>×</CloseButton>
-
-                {isLoading && (
-                    <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}>
-                        <ThreeCircles
-                            visible={true}
-                            height="80"
-                            width="80"
-                            color="#6D6D6D"
-                            ariaLabel="three-circles-loading"
-                        />
-                    </div>
-                )}
-
-                <img 
-                    ref={imgRef}
-                    src={selectedImage.binaryString}  
-                    alt="fullscreen" 
-                    style={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block'}}  
-                />
+            <FullscreenContainer onClick={handleOverlayClick}>
+            <CloseButton onClick={onClose}>×</CloseButton>
+                <div style={{ position: 'relative', width: '90%', maxWidth: '1000px', backgroundColor: 'transparent' }}>
                 
-                <div style={{ position: 'absolute', bottom: '30px', right: '40px', display: 'flex', gap: '29px', alignItems: 'center' }}>
-                    {isPurchased ? (
-                        <>
-                            <DownloadButton tabIndex={0} onClick={handleDownloadClick}>
-                                <img src={downArrow} alt="svg" style={{ width: '24px', height: '21px' }} />Download
-                            </DownloadButton>
-                            {isMobile && (
-                                 <ShareButton  onClick={toggleSharePopup}> 
-                                    <img src={share} alt="svg" />
-                                    Share
-                                </ShareButton>
-                            )}
-                            <SeeInFrameButton>See in Frame</SeeInFrameButton>
-                        </>
-                    ) : (
-                        <>
-                            <UnlockButton onClick={handleUnlockPhoto}>Unlock photo</UnlockButton>
-                            {albumImages && (
-                                <UnlockButton onClick={handleUnlockAlbum}>Unlock entire album</UnlockButton>
-                            )}
-                         </>
+                    {isLoading && (
+                        <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}>
+                            <ThreeCircles
+                                visible={true}
+                                height="80"
+                                width="80"
+                                color="#6D6D6D"
+                                ariaLabel="three-circles-loading"
+                            />
+                        </div>
                     )}
+
+                    <img 
+                        ref={imgRef}
+                        src={selectedImage.binaryString}  
+                        alt="fullscreen" 
+                        style={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block'}}  
+                    />
                 </div>
-               
-                {showPayPopup && (
-                    <PayPopup 
-                        onClose={() => setShowPayPopup(false)} 
-                        imageIds={albumImages?.map((image) => Number(image.id))!} 
-                        selectedImageId={imageId}
-                        albumName={albumName}                
-                    />
-                )}
+                    <div style={{ position: 'absolute', bottom: '30px', right: '40px', display: 'flex', gap: '29px', alignItems: 'center' }}>
+                        {isPurchased ? (
+                            <>
+                                <DownloadButton 
+                                    tabIndex={0} 
+                                    onClick={!isLoading ? handleDownloadClick : undefined}
+                                    style={{opacity: isLoading ? 0.5 : 1, cursor: isLoading ? 'not-allowed' : 'pointer'}}
+                                >
+                                    <img src={downArrow} alt="svg" style={{ width: '24px', height: '21px' }} />Download
+                                </DownloadButton>
+                                {isMobile && (
+                                    <ShareButton  onClick={toggleSharePopup}> 
+                                        <img src={share} alt="svg" />
+                                        Share
+                                    </ShareButton>
+                                )}
+                                <SeeInFrameButton>See in Frame</SeeInFrameButton>
+                            </>
+                        ) : (
+                            <>
+                                <UnlockButton onClick={handleUnlockPhoto}>Unlock photo</UnlockButton>
+                                {albumImages && (
+                                    <UnlockButton onClick={handleUnlockAlbum}>Unlock entire album</UnlockButton>
+                                )}
+                            </>
+                        )}
+                    </div>
+                
+                    {showPayPopup && (
+                        <PayPopup 
+                            onClose={() => setShowPayPopup(false)} 
+                            imageIds={albumImages?.map((image) => Number(image.id))!} 
+                            selectedImageId={imageId}
+                            albumName={albumName}                
+                        />
+                    )}
 
-
-                {showSharePopup && (
-                    <SharePopup 
-                        selectedImage={{ 
-                            binaryString: selectedImage.binaryString, 
-                            id: Number(imageId), 
-                            isPurchased,           
-                            date                   
-                        }}  
-                        onClose={toggleSharePopup}  
-                    />
-                )}
+                    {showSharePopup && (
+                        <SharePopup 
+                            selectedImage={{ 
+                                binaryString: selectedImage.binaryString, 
+                                id: Number(imageId), 
+                                isPurchased,           
+                                date                   
+                            }}  
+                            onClose={toggleSharePopup}  
+                        />
+                    )}
+                
             </FullscreenContainer>
-            </FocusTrap>
+        </FocusTrap>
     );
 };
 

@@ -59,44 +59,47 @@ const SelfieEdit = ({ onClose, tempSelfieSrc, onRetake, onSave }: SelfieEditProp
               width: '185px', 
               height: '185px', 
               borderRadius: '50%', 
-              overflow: 'hidden', 
-              boxSizing: 'border-box', 
               marginBottom: '95px',
-              backgroundColor: 'transparent' 
             }}
           >
             {selfieSource ? (
+              <div 
+              style={{ 
+                position: 'absolute', 
+                width: '250px',  
+                height: '250px', 
+                top: '-20px', 
+                left: '-20px',
+                clipPath: 'circle(85.5px at 50% 50%)',  
+              }}
+            >
               <Cropper 
-                image={selfieSource} // Use selfieSource here
+                image={selfieSource} 
                 crop={crop}
                 zoom={zoom}
                 aspect={1} 
                 onCropChange={setCrop}
                 onZoomChange={setZoom}
                 onCropComplete={onCropComplete}
+                cropShape="round"
+                showGrid={false}
                 style={{
-                  cropAreaStyle: { 
-                    display: 'none'
-                  },
                   containerStyle: { 
-                    borderRadius: '50%', 
                     width: '100%', 
-                    height: '100%',
-                    backgroundColor: 'transparent', 
-                    boxSizing: 'border-box',
-                    overflow: 'hidden', 
+                    height: '100%', 
+                    border: 'none',
+                    boxSizing: 'border-box', 
                   },
                   mediaStyle: { 
-                    borderRadius: '50%', 
-                    width: '100%', 
-                    height: '100%',
                     objectFit: 'cover', 
+                    width: '100%',
+                    height: '100%',
                   }
                 }}
-                showGrid={false}  
               />
+              </div>
             ) : (
-              <p>No image to display</p> // Display a fallback if no image is available
+              <p>No image to display</p> 
             )}
           </div>
           <ButtonContainer>

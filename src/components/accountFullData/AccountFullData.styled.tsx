@@ -112,8 +112,8 @@ export const Album = styled.div`
 export const PhotoContainer = styled.div`
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(400px, 1fr)); 
-    grid-template-rows: auto;
-    gap: 0;
+    grid-template-rows: 1fr;
+    gap: 0px;
 
     @media (max-width: 1440px) {
         grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
@@ -198,8 +198,10 @@ export const ImageWrapper = styled.div`
     width: 100%;
     height: 100%;
     position: relative;
-    border: 0.3px solid var(--button-hover-color);  
-    background-color: rgba(51, 0, 204, 0.05);
+    box-sizing: border-box;
+    overflow: hidden;
+    border: none;  
+    background-color: transparent;
     aspect-ratio: 1 / 1;
 `;
 

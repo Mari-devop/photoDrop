@@ -175,7 +175,7 @@ const Navbar = () => {
             <Wrapper>
               <Title>{albumId}</Title> 
               <TextContainer>
-                <span>{photoCount} photos</span>
+                <span>{photoCount} {photoCount === '1' ? 'photo' : 'photos'}</span>
                 <p>{formattedDate}</p>
               </TextContainer>
             </Wrapper>
